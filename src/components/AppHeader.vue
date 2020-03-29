@@ -1,0 +1,87 @@
+<template>
+    <div>
+        <b-navbar>
+            <template slot="brand">
+                <b-navbar-item :to="{ path: '/' }" tag="router-link">
+                    <img alt="iPass Logo" src="../assets/logo.png" />
+                </b-navbar-item>
+            </template>
+            <template slot="start">
+                <div class="is-flex ai-center">
+                    <div class="title is-4">Approver Dashboard</div>
+                </div>
+            </template>
+
+            <template slot="end">
+                <b-navbar-item tag="div">
+                    <b-dropdown aria-role="list" position="is-bottom-left">
+                        <button class="button is-outlined" slot="trigger">
+                            <span>{{ selectedLang }}</span>
+                            <b-icon icon="menu-down"></b-icon>
+                        </button>
+
+                        <b-dropdown-item
+                            :key="i"
+                            aria-role="listitem"
+                            v-for="(item, i) in langs"
+                            >{{ item }}</b-dropdown-item
+                        >
+                    </b-dropdown>
+
+                    <b-dropdown aria-role="list" position="is-bottom-left">
+                        <button class="button is-outlined" slot="trigger">
+                            <span>Account</span>
+                            <b-icon icon="menu-down"></b-icon>
+                        </button>
+
+                        <b-dropdown-item disabled>
+                            <b>Logged in as</b>
+                            <p>something@gmail.com</p>
+                        </b-dropdown-item>
+                        <hr class="dropdown-divider" />
+                        <b-dropdown-item>
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon icon="account"></b-icon>
+                                <span>Staff Members</span>
+                            </div>
+                        </b-dropdown-item>
+                        <b-dropdown-item aria-role="menuitem" value="logout">
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon icon="logout"></b-icon>
+                                <span>Sign out</span>
+                            </div>
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </b-navbar-item>
+            </template>
+        </b-navbar>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'AppHeader',
+    data() {
+        return {
+            selectedLang: 'En',
+            langs: ['Hi']
+        };
+    }
+};
+</script>
+
+<style lang="scss">
+.ai-center {
+    align-items: center;
+}
+
+.navbar-brand {
+    padding-left: 30px;
+}
+
+.dropdown-menu-item {
+    .icon {
+        margin-right: 8px;
+    }
+}
+</style>
