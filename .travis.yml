@@ -1,5 +1,5 @@
 language: node_js
-node_js: "10"
+node_js: "12"
 cache: npm
 
 install:
@@ -10,11 +10,11 @@ script:
 
 deploy:
   provider: pages
-  skip-cleanup: true
+  skip_cleanup: true
   github-token: $GITHUB_TOKEN
   local_dir: dist
   on: 
-    branch: master
+    tags: true
 
 
 
