@@ -7,7 +7,7 @@
                 <b-tab-item label="Organizations">
                     <organization-tab-item></organization-tab-item>
                 </b-tab-item>
-                <b-tab-item label="Individuals">
+                <b-tab-item disabled label="Individuals">
                     <individual-tab-item></individual-tab-item>
                 </b-tab-item>
             </b-tabs>
@@ -31,11 +31,19 @@ export default {
 
 <style lang="scss">
 .app-body {
-    padding: 20px 40px;
+    padding: 20px 40px 100px;
     border-top: 1px solid #ededed;
 
     .tabs a {
         border-width: 2px;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .table tr.is-checked {
+        background-color: #f7f7f7;
     }
 }
 </style>

@@ -9,12 +9,17 @@
         <div class>
             <div class="buttons">
                 <b-button
+                    @click="$emit('decline')"
                     icon-left="close-circle-outline"
                     outlined
                     type="is-danger"
-                    >Reject Requests</b-button
+                    >Decline Requests</b-button
                 >
-                <b-button icon-left="check-circle-outline" type="is-primary"
+
+                <b-button
+                    @click="$emit('approve')"
+                    icon-left="check-circle-outline"
+                    type="is-primary"
                     >Approve Requests</b-button
                 >
             </div>
@@ -35,6 +40,7 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 30;
     background-color: white;
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);
     padding: 30px 80px;

@@ -84,9 +84,9 @@
                     </div>
                 </b-table-column>
 
-                <b-table-column field="type" label="Pass Type" sortable>{{
-                    props.row.type
-                }}</b-table-column>
+                <b-table-column field="type" label="Pass Type" sortable>
+                    {{ props.row.type }}
+                </b-table-column>
 
                 <b-table-column
                     field="passCount"
@@ -96,9 +96,9 @@
                     >{{ props.row.passCount }}</b-table-column
                 >
 
-                <b-table-column field="status" label="Status" sortable>{{
-                    props.row.status
-                }}</b-table-column>
+                <b-table-column field="status" label="Status" sortable>
+                    {{ props.row.status }}
+                </b-table-column>
                 <b-table-column label=" ">
                     <b-dropdown aria-role="list" position="is-bottom-left">
                         <button class="button is-small is-white" slot="trigger">
@@ -107,13 +107,22 @@
 
                         <b-dropdown-item aria-role="listitem">
                             <div class="is-flex dropdown-menu-item">
-                                <b-icon icon="logout"></b-icon>
+                                <b-icon
+                                    icon="check-circle-outline"
+                                    type="is-success"
+                                ></b-icon>
                                 <span>Approve</span>
                             </div>
                         </b-dropdown-item>
-                        <b-dropdown-item aria-role="listitem"
-                            >Decline</b-dropdown-item
-                        >
+                        <b-dropdown-item aria-role="listitem">
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon
+                                    icon="close-circle-outline"
+                                    type="is-danger"
+                                ></b-icon>
+                                <span>Decline</span>
+                            </div>
+                        </b-dropdown-item>
                     </b-dropdown>
                 </b-table-column>
             </template>
@@ -155,7 +164,6 @@ export default {
                 passCount: 20 + i,
                 status: 'Pending'
             }));
-        console.log('data: ', data);
 
         return {
             data,

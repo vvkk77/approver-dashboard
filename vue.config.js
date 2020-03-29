@@ -1,4 +1,12 @@
 module.exports = {
+    devServer: {
+        port: 9090,
+        watchOptions: {
+            poll: true
+        }
+    },
+    publicPath: './',
+
     chainWebpack: config => {
         config.plugin('html').tap(args => {
             args[0].title = 'Approver Dashboard';

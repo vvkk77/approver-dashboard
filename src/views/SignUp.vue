@@ -10,10 +10,7 @@
                         width="120"
                     />
 
-                    <div class="title is-5">
-                        Verify and issue commute passes to authorised
-                        <br />people during the COVID pandemic
-                    </div>
+                    <div class="title is-5">{{ typeText }}</div>
 
                     <div class="login-bg">
                         <img alt src="../assets/login-bg.png" />
@@ -22,33 +19,7 @@
             </div>
             <div class="column full-height">
                 <div class="sign-up-form-container full-height">
-                    <div class="title">Login</div>
-
-                    <section>
-                        <b-field label="Email">
-                            <b-input
-                                type="email"
-                                v-model="user.email"
-                            ></b-input>
-                        </b-field>
-
-                        <b-field label="Enter Password">
-                            <b-input
-                                password-reveal
-                                type="password"
-                                v-model="user.pass"
-                            ></b-input>
-                        </b-field>
-
-                        <div class="buttons m-t-48">
-                            <b-button
-                                class="has-text-weight-bold"
-                                expanded
-                                type="is-primary"
-                                >Login</b-button
-                            >
-                        </div>
-                    </section>
+                    <login-form></login-form>
                 </div>
             </div>
         </div>
@@ -56,15 +27,34 @@
 </template>
 
 <script>
+import LoginForm from '../components/LoginForm.vue';
 export default {
     name: 'SignUp',
+    components: { LoginForm },
     data() {
         return {
-            user: {
-                email: '',
-                pass: ''
-            }
+            welcomeText:
+                'Verify and issue commute passes to authorised people during the COVID pandemic',
+            typeText: ''
         };
+    },
+
+    mounted() {
+        let count = 0;
+        const timer = setInterval(() => {
+            if (
+                this.welcomeText.length === this.typeText.length ||
+                count > this.welcomeText.length
+            ) {
+                clearInterval(timer);
+            } else {
+                this.typeText = this.welcomeText.slice(0, count);
+                count++;
+            }
+        }, 30);
+    },
+    created() {
+        localStorage.clear();
     }
 };
 </script>
@@ -85,15 +75,6 @@ export default {
 .sign-up-form-container {
     padding: 60px 36px;
     background-color: #f5f5f5;
-    section {
-        margin-top: 60px;
-    }
-    button {
-        height: 40px;
-    }
-    .label {
-        font-weight: 600;
-    }
 }
 
 .sign-up-info-container {
@@ -116,7 +97,8 @@ export default {
     }
 }
 
-.m-t-48 {
+.m-y-48 {
     margin-top: 48px;
+    margin-bottom: 48px;
 }
 </style>

@@ -2,4 +2,17 @@
     <router-view></router-view>
 </template>
 
+<script>
+import EPassService from './service/EPassService';
+
+export default {
+    name: 'App',
+
+    created() {
+        if (this.$route.path !== '/signup' && !EPassService.isSessionValid()) {
+            this.$router.replace('/signup');
+        }
+    }
+};
+</script>
 <style lang="scss"></style>

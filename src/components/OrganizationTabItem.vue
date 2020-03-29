@@ -3,11 +3,11 @@
         <div class="is-flex jc-space-between">
             <div class="is-flex">
                 <b-field>
-                    <b-radio-button native-value="pass" v-model="radioButton">
+                    <b-radio-button native-value="pass" v-model="requestType">
                         <span>Pass Request</span>
                     </b-radio-button>
-                    <b-radio-button native-value="signup" v-model="radioButton">
-                        <span>SignUp Request</span>
+                    <b-radio-button native-value="signup" v-model="requestType">
+                        <span>Sign Up Request</span>
                     </b-radio-button>
                 </b-field>
             </div>
@@ -53,149 +53,29 @@
 
         <br />
 
-        <b-table
-            :checked-rows.sync="checkedRows"
-            :current-page.sync="currentPage"
-            :data="data"
-            :default-sort-direction="defaultSortDirection"
-            :is-row-checkable="row => true"
-            :paginated="isPaginated"
-            :pagination-position="paginationPosition"
-            :pagination-simple="isPaginationSimple"
-            :per-page="perPage"
-            :sort-icon="sortIcon"
-            :sort-icon-size="sortIconSize"
-            checkable
-            checkbox-position="left"
-        >
-            <template slot-scope="props">
-                <b-table-column field="createAt" label="Raised on" sortable>
-                    <div class="has-text-dark is-size-6">
-                        {{ props.row.createAt | formatDate }}
-                    </div>
-                    <div class="has-text-grey is-size-6">
-                        {{ props.row.createAt | formatTime }}
-                    </div>
-                </b-table-column>
-
-                <b-table-column
-                    field="organization"
-                    label="Organization"
-                    sortable
-                    >{{ props.row.organization }}</b-table-column
-                >
-
-                <b-table-column field="email" label="Contact Email" sortable>
-                    <div class="has-text-dark is-size-6">
-                        {{ props.row.email }}
-                    </div>
-                </b-table-column>
-
-                <b-table-column field="type" label="Pass Type" sortable>{{
-                    props.row.type
-                }}</b-table-column>
-
-                <b-table-column
-                    field="passCount"
-                    label="No. of Passes"
-                    numeric
-                    sortable
-                    >{{ props.row.passCount }}</b-table-column
-                >
-
-                <b-table-column field="status" label="Status" sortable>
-                    <span
-                        class="has-text-weight-bold is-uppercase has-text-warning"
-                        >{{ props.row.status }}</span
-                    >
-                </b-table-column>
-                <b-table-column label=" ">
-                    <button class="button is-small is-white">
-                        <b-icon icon="dots-vertical"></b-icon>
-                    </button>
-                </b-table-column>
-            </template>
-            <template slot="bottom-left">
-                <span class="is-6">Request per page:</span>
-                <b-select
-                    placeholder="Select a character"
-                    size="is-small"
-                    v-model="perPage"
-                >
-                    <option
-                        :key="index"
-                        :value="item"
-                        v-for="(item, index) in [10, 25, 50]"
-                        >{{ item }}</option
-                    >
-                </b-select>
-            </template>
-        </b-table>
-
-        <table-action-sheet v-if="checkedRows.length > 0"></table-action-sheet>
-
-        <b-modal :active.sync="isModalActive" has-modal-card>
-            <div class="modal-card">
-                <div class="modal-card-body">
-                    <p class="title is-4">Enter Reason</p>
-                    <p class="subtitle">Jeff Atwood</p>
-                </div>
-            </div>
-        </b-modal>
+        <pass-request-table v-if="requestType === 'pass'"></pass-request-table>
+        <sign-up-request-table v-else></sign-up-request-table>
     </div>
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import TableActionSheet from './TableActionSheet.vue';
+import PassRequestTable from './PassRequestTable.vue';
+import SignUpRequestTable from './SignUpRequestTable.vue';
 
 export default {
     name: 'OrganizationTabItem',
     components: {
-        TableActionSheet
+        PassRequestTable,
+        SignUpRequestTable
     },
     data() {
-        const data = Array(48)
-            .fill(0)
-            .map(i => ({
-                id: Math.random()
-                    .toString()
-                    .slice(2),
-                createAt: Date.now(),
-                organization: 'Swiggy',
-                email: 'swiggy@gmail.com',
-                type: 'individual',
-                passCount: 20 + i,
-                status: 'Pending'
-            }));
-        console.log('data: ', data);
-
         return {
-            data,
-            radioButton: 'pass',
-            checkedRows: [],
-            isModalActive: false,
-
-            isPaginated: true,
-            isPaginationSimple: false,
-            paginationPosition: 'bottom',
-            defaultSortDirection: 'asc',
-            sortIcon: 'arrow-up',
-            sortIconSize: 'is-small',
-            currentPage: 1,
-            perPage: 10
+            signUpList: [],
+            requestType: 'pass'
         };
     },
 
-    filters: {
-        formatDate(date) {
-            return dayjs(new Date(date)).format('DD MMM YY');
-        },
-        formatTime(date) {
-            return dayjs(new Date(date)).format('hh:mm A');
-        }
-    },
-    watch: {}
+    mounted() {}
 };
 </script>
 

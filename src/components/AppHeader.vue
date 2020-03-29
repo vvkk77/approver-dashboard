@@ -8,6 +8,7 @@
             </template>
             <template slot="start">
                 <div class="is-flex ai-center">
+                    <div class="seperator"></div>
                     <div class="title is-4">Approver Dashboard</div>
                 </div>
             </template>
@@ -35,8 +36,8 @@
                         </button>
 
                         <b-dropdown-item disabled>
-                            <b>Logged in as</b>
-                            <p>something@gmail.com</p>
+                            <b>Logged in as {{ userInfo.accountName }}</b>
+                            <p>{{ userInfo.email }}</p>
                         </b-dropdown-item>
                         <hr class="dropdown-divider" />
                         <b-dropdown-item>
@@ -45,7 +46,11 @@
                                 <span>Staff Members</span>
                             </div>
                         </b-dropdown-item>
-                        <b-dropdown-item aria-role="menuitem" value="logout">
+                        <b-dropdown-item
+                            @click="logout"
+                            aria-role="menuitem"
+                            value="logout"
+                        >
                             <div class="is-flex dropdown-menu-item">
                                 <b-icon icon="logout"></b-icon>
                                 <span>Sign out</span>
@@ -64,8 +69,15 @@ export default {
     data() {
         return {
             selectedLang: 'En',
-            langs: ['Hi']
+            langs: ['Hi'],
+            userInfo: JSON.parse(localStorage.getItem('userInfo'))
         };
+    },
+    methods: {
+        logout() {
+            localStorage.clear();
+            window.location.reload();
+        }
     }
 };
 </script>
@@ -73,15 +85,34 @@ export default {
 <style lang="scss">
 .ai-center {
     align-items: center;
+
+    .seperator {
+        width: 2px;
+        height: 34px;
+        background-color: #ededed;
+        margin: 0 16px;
+    }
+}
+
+.navbar {
+    padding: 8px 0;
 }
 
 .navbar-brand {
     padding-left: 30px;
 }
 
+.navbar-end {
+    padding-right: 30px;
+}
+
 .dropdown-menu-item {
     .icon {
         margin-right: 8px;
     }
+}
+
+.dropdown-item.is-disabled {
+    pointer-events: none;
 }
 </style>
