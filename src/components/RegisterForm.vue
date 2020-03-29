@@ -101,8 +101,8 @@
     </div>
 
     <verify-otp-form
-        @verfied="$emit('registered')"
         :emailId="user.email"
+        @verfied="$emit('registered')"
         v-else
     ></verify-otp-form>
 </template>
@@ -209,7 +209,7 @@ export default {
             try {
                 const { name, email, pass, orgId, orgName } = this.user;
 
-                const { data } = await EPassService.createAccount({
+                await EPassService.createAccount({
                     email: email.trim(),
                     name: name.trim(),
                     password: pass.trim(),
@@ -217,13 +217,10 @@ export default {
                     orgID: orgId.trim()
                 });
 
-                console.log('data: ', data);
-
                 this.loading = false;
 
                 this.openOTP = true;
             } catch (error) {
-                console.log('error: ', error);
                 this.loading = false;
             }
         }
