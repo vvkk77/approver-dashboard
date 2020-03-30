@@ -10,7 +10,7 @@ export default {
     name: 'App',
 
     created() {
-        if (!EPassService.isSessionValid()) {
+        if (this.$route.path !== '/signup' && !EPassService.isSessionValid()) {
             this.$router.replace('/signup');
         }
     }

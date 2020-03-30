@@ -51,6 +51,9 @@ export default {
                 count++;
             }
         }, 30);
+    },
+    created() {
+        localStorage.clear();
     }
 };
 </script>
