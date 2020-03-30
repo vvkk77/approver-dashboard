@@ -129,6 +129,7 @@
 <script>
 import EPassService from '../service/EPassService';
 import SignUpTableActionSheet from './SignUpTableActionSheet.vue';
+import { showError, showSuccess } from '../utils/toast';
 
 export default {
     name: 'PassRequestTable',
@@ -168,13 +169,25 @@ export default {
 
     methods: {
         async fetchSignUpRequests() {
-            const { data } = await EPassService.getSignUpRequests();
-            this.signUpList = data.accounts;
-            localStorage.setItem('signUpList', JSON.stringify(data.accounts));
+            try {
+                const { data } = await EPassService.getSignUpRequests();
+                this.signUpList = data.accounts;
+                localStorage.setItem(
+                    'signUpList',
+                    JSON.stringify(data.accounts)
+                );
+            } catch (error) {
+                showError(`Unable to fetch requests`);
+            }
         },
         async approveSignUp(email) {
-            await EPassService.approveAccount(email);
-            await this.fetchSignUpRequests();
+            try {
+                await EPassService.approveAccount(email);
+                await this.fetchSignUpRequests();
+                showSuccess(`Request Approved!`);
+            } catch (error) {
+                showError(`Unable to approve request`);
+            }
         },
 
         async approveAll() {
@@ -192,10 +205,12 @@ export default {
 
                 this.checkedRows = [];
                 this.showProgess = false;
+
+                showSuccess(`All Request Approved!`);
             } catch (error) {
                 this.showProgess = false;
                 this.checkedRows = [];
-                await this.fetchSignUpRequests();
+                showError(`Unable to approve requests`);
             }
         }
     },

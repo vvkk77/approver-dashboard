@@ -46,4 +46,8 @@ export default {
         background-color: #f7f7f7;
     }
 }
+
+.toast {
+    font-weight: 600;
+}
 </style>

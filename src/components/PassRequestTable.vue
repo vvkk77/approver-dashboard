@@ -25,9 +25,9 @@
                     </div>
                 </b-table-column>
 
-                <b-table-column field="orgName" label="Organization" sortable>
-                    {{ props.row.orgName }}
-                </b-table-column>
+                <b-table-column field="orgName" label="Organization" sortable>{{
+                    props.row.orgName
+                }}</b-table-column>
 
                 <b-table-column
                     field="requester"
@@ -69,7 +69,9 @@
                 </b-table-column>
                 <b-table-column label=" ">
                     <b-dropdown
-                        :disabled="props.row.orderStatus === 'declined'"
+                        :disabled="
+                            props.row.orderStatus.match('declined|approved')
+                        "
                         aria-role="list"
                         position="is-bottom-left"
                     >
@@ -214,6 +216,7 @@ import EPassService from '../service/EPassService';
 import Lozenge from './Lozenge.vue';
 import PassTableActionSheet from './PassTableActionSheet.vue';
 import dayjs from 'dayjs';
+import { showSuccess, showError } from '../utils/toast';
 
 export default {
     name: 'PassRequestTable',
@@ -275,63 +278,94 @@ export default {
     },
     methods: {
         async fetchAllOrders() {
-            const { data } = await EPassService.getAllOrders();
-            this.orderList = data.orders;
-            localStorage.setItem('orderList', JSON.stringify(data.orders));
+            try {
+                const { data } = await EPassService.getAllOrders();
+                this.orderList = data.orders;
+                localStorage.setItem('orderList', JSON.stringify(data.orders));
+            } catch (error) {
+                showError(`Unable to fetch requests`);
+            }
         },
 
         async approveRequest(orderId) {
-            await EPassService.approveOrder(orderId, 'ACCEPT');
-            await this.fetchAllOrders();
+            try {
+                await EPassService.approveOrder(orderId, 'ACCEPT');
+                await this.fetchAllOrders();
+                showSuccess(`Request Approved!`);
+            } catch (error) {
+                showError(`Unable to approve request`);
+            }
         },
 
         async declineRequest(orderId) {
-            await EPassService.approveOrder(orderId, 'DECLINE');
-            await this.fetchAllOrders();
-            this.declineOrderId = null;
+            try {
+                await EPassService.approveOrder(orderId, 'DECLINE');
+                await this.fetchAllOrders();
+                this.declineOrderId = null;
+                showSuccess(`Request Rejected!`);
+            } catch (error) {
+                showError(`Unable to reject request`);
+            }
         },
 
         async approveAll() {
-            this.showProgess = true;
-            const orderIdList = this.checkedRows.map(i => i.id);
+            try {
+                this.showProgess = true;
+                const orderIdList = this.checkedRows.map(i => i.id);
 
-            for (let index = 0; index < orderIdList.length; index++) {
-                this.reqIndex = index + 1;
-                const orderId = orderIdList[index];
-                await EPassService.approveOrder(orderId, 'ACCEPT');
+                for (let index = 0; index < orderIdList.length; index++) {
+                    this.reqIndex = index + 1;
+                    const orderId = orderIdList[index];
+                    await EPassService.approveOrder(orderId, 'ACCEPT');
+                }
+
+                await this.fetchAllOrders();
+
+                this.checkedRows = [];
+                this.showProgess = false;
+
+                showSuccess(`All Request Approved!`);
+            } catch (error) {
+                showError(`Unable to approve requests`);
             }
-
-            await this.fetchAllOrders();
-
-            this.checkedRows = [];
-            this.showProgess = false;
         },
         async declineAll() {
-            this.showProgess = true;
+            try {
+                this.showProgess = true;
 
-            const orderIdList = this.checkedRows.map(i => i.id);
+                const orderIdList = this.checkedRows.map(i => i.id);
 
-            for (let index = 0; index < orderIdList.length; index++) {
-                this.reqIndex = index + 1;
-                const orderId = orderIdList[index];
-                await EPassService.approveOrder(orderId, 'DECLINE');
+                for (let index = 0; index < orderIdList.length; index++) {
+                    this.reqIndex = index + 1;
+                    const orderId = orderIdList[index];
+                    await EPassService.approveOrder(orderId, 'DECLINE');
+                }
+
+                await this.fetchAllOrders();
+
+                this.checkedRows = [];
+                this.showProgess = false;
+                showSuccess(`All Request Rejected!`);
+            } catch (error) {
+                showError(`Unable to reject requests`);
             }
-
-            await this.fetchAllOrders();
-
-            this.checkedRows = [];
-            this.showProgess = false;
         },
 
         async downloadQRCodes(orderId) {
-            const { data } = await EPassService.downloadQRCodes(orderId);
-            const url = data.processedS3URL;
+            try {
+                const { data } = await EPassService.downloadQRCodes(orderId);
+                const url = data.processedS3URL;
 
-            const ele = document.createElement('a');
-            ele.setAttribute('download', 'download');
-            ele.href = url;
+                const ele = document.createElement('a');
+                ele.setAttribute('download', 'download');
+                ele.href = url;
 
-            ele.click();
+                ele.click();
+
+                showSuccess(`QR codes downloaded successfully`);
+            } catch (error) {
+                showError(`Unable to download QR codes`);
+            }
         },
 
         handleDeclineAll() {
