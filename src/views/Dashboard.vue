@@ -37,6 +37,7 @@ import AppHeader from '../components/AppHeader.vue';
 import CreateRequest from '../components/CreateRequest.vue';
 import EPassService from '../service/EPassService';
 import OrdersTable from '../components/OrdersTable.vue';
+import { showError } from '../utils/toast';
 
 export default {
     name: 'Dashboard',
@@ -63,10 +64,17 @@ export default {
         },
 
         async fetchOrders() {
-            const { data } = await EPassService.getOrders();
+            try {
+                const { data } = await EPassService.getOrders();
 
-            this.orderList = data.orders;
-            localStorage.setItem('reqOrderList', JSON.stringify(data.orders));
+                this.orderList = data.orders;
+                localStorage.setItem(
+                    'reqOrderList',
+                    JSON.stringify(data.orders)
+                );
+            } catch (error) {
+                showError('Unable to fetch requests');
+            }
         },
 
         onOrderSuccess() {
@@ -98,5 +106,9 @@ export default {
         width: 50%;
         max-width: 480px;
     }
+}
+
+.toast {
+    font-weight: 600;
 }
 </style>

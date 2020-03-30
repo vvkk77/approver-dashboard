@@ -85,6 +85,7 @@
 import Lozenge from './Lozenge.vue';
 import dayjs from 'dayjs';
 import EPassService from '../service/EPassService';
+import { showSuccess, showError } from '../utils/toast';
 
 export default {
     name: 'OrdersTable',
@@ -127,14 +128,20 @@ export default {
 
     methods: {
         async downloadQRCodes(orderId) {
-            const { data } = await EPassService.downloadQRCodes(orderId);
-            const url = data.processedS3URL;
+            try {
+                const { data } = await EPassService.downloadQRCodes(orderId);
+                const url = data.processedS3URL;
 
-            const ele = document.createElement('a');
-            ele.setAttribute('download', 'download');
-            ele.href = url;
+                const ele = document.createElement('a');
+                ele.setAttribute('download', 'download');
+                ele.href = url;
 
-            ele.click();
+                ele.click();
+
+                showSuccess(`QR codes downloaded successfully`);
+            } catch (error) {
+                showError(`Unable to download QR codes`);
+            }
         },
         getStatusClass(status) {
             switch (status) {
