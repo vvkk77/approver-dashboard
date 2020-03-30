@@ -63,6 +63,13 @@ export default {
         return axios.post('/createOrder', formData, { headers: fileHeaders });
     },
 
+    downloadQRCodes(orderID) {
+        return axios.post('/downloadQRCodes', {
+            orderID,
+            authToken: localStorage.getItem(AUTHTOKEN)
+        });
+    },
+
     getOrders() {
         const userInfo = localStorage.getItem('userInfo');
         const { accountID } = JSON.parse(userInfo);

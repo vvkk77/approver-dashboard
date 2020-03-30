@@ -48,6 +48,7 @@
                 </b-table-column>
                 <b-table-column label=" ">
                     <b-button
+                        @click="downloadQRCodes(props.row.id)"
                         class="has-text-primary has-text-weight-semibold"
                         icon-left="download"
                         size="is-small"
@@ -83,6 +84,7 @@
 <script>
 import Lozenge from './Lozenge.vue';
 import dayjs from 'dayjs';
+import EPassService from '../service/EPassService';
 
 export default {
     name: 'OrdersTable',
@@ -124,6 +126,16 @@ export default {
     },
 
     methods: {
+        async downloadQRCodes(orderId) {
+            const { data } = await EPassService.downloadQRCodes(orderId);
+            const url = data.processedS3URL;
+
+            const ele = document.createElement('a');
+            ele.setAttribute('download', 'download');
+            ele.href = url;
+
+            ele.click();
+        },
         getStatusClass(status) {
             switch (status) {
                 case 'created':
