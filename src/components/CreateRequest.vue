@@ -175,7 +175,8 @@ export default {
                 'Banks, ATM, Insuarance Companies',
                 'Petrol, GAS, LPG station'
             ],
-            file: null
+            file: null,
+            apiError: null
         };
     },
     methods: {
@@ -231,7 +232,7 @@ export default {
 
                 this.$emit('success');
             } catch (error) {
-                console.log('error: ', error);
+                this.apiError = error;
             }
         }
     }
