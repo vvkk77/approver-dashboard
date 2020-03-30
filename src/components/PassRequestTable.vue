@@ -25,9 +25,9 @@
                     </div>
                 </b-table-column>
 
-                <b-table-column field="orgName" label="Organization" sortable>{{
-                    props.row.orgName
-                }}</b-table-column>
+                <b-table-column field="orgName" label="Organization" sortable>
+                    {{ props.row.orgName }}
+                </b-table-column>
 
                 <b-table-column
                     field="requester"
@@ -91,7 +91,7 @@
                                 </div>
                             </b-dropdown-item>
                             <b-dropdown-item
-                                @click="declineRequest(props.row.id)"
+                                @click="handleDecline(props.row.id)"
                                 aria-role="listitem"
                             >
                                 <div class="is-flex dropdown-menu-item">
@@ -143,15 +143,50 @@
 
         <pass-table-action-sheet
             @approve="approveAll"
-            @decline="declineAll"
+            @decline="handleDeclineAll"
             v-if="checkedRows.length > 0"
         ></pass-table-action-sheet>
 
-        <b-modal :active.sync="isModalActive" has-modal-card>
-            <div class="modal-card">
-                <div class="modal-card-body">
-                    <p class="title is-4">Enter Reason</p>
-                    <p class="subtitle">Jeff Atwood</p>
+        <b-modal :active.sync="showDeclineModal" has-modal-card>
+            <div class="modal-card decline-modal" style="width:480px">
+                <div class="modal-card-body is-rounded">
+                    <p class="title is-5">Enter Reason</p>
+                    <p class="subtitle is-7">
+                        Let the applicant know why their request is being
+                        rejected
+                    </p>
+
+                    <b-field>
+                        <b-input
+                            maxlength="400"
+                            type="textarea"
+                            v-model="declineReason"
+                        ></b-input>
+                    </b-field>
+
+                    <div class="is-flex jc-flex-end">
+                        <div class="buttons">
+                            <b-button
+                                @click="
+                                    declineMultiple = showDeclineModal = false
+                                "
+                                outlined
+                                type="is-primary"
+                                >Cancel</b-button
+                            >
+
+                            <b-button
+                                :disabled="!declineReason"
+                                type="is-primary"
+                                v-on="{
+                                    click: declineMultiple
+                                        ? submitReasonForMultiple
+                                        : submitReason
+                                }"
+                                >Submit</b-button
+                            >
+                        </div>
+                    </div>
                 </div>
             </div>
         </b-modal>
@@ -160,10 +195,14 @@
             <div class="modal-card">
                 <div class="modal-card-body is-rounded">
                     <p class="title is-4">Submitting Requests</p>
-                    <b-progress :value="reqProgess" show-value type="is-success"
-                        >{{ reqIndex }} out of
-                        {{ checkedRows.length }}</b-progress
+                    <b-progress
+                        :value="reqProgess"
+                        show-value
+                        type="is-success"
                     >
+                        {{ reqIndex }} out of
+                        {{ checkedRows.length }}
+                    </b-progress>
                 </div>
             </div>
         </b-modal>
@@ -191,8 +230,11 @@ export default {
         return {
             orderList: orderList || [],
             checkedRows: [],
-            isModalActive: false,
+            showDeclineModal: false,
 
+            declineReason: '',
+            declineOrderId: null,
+            declineMultiple: false,
             isPaginated: true,
             isPaginationSimple: false,
             paginationPosition: 'bottom',
@@ -246,6 +288,7 @@ export default {
         async declineRequest(orderId) {
             await EPassService.approveOrder(orderId, 'DECLINE');
             await this.fetchAllOrders();
+            this.declineOrderId = null;
         },
 
         async approveAll() {
@@ -291,6 +334,30 @@ export default {
             ele.click();
         },
 
+        handleDeclineAll() {
+            this.showDeclineModal = true;
+            this.declineReason = '';
+            this.declineMultiple = true;
+        },
+
+        submitReason() {
+            this.declineMultiple = false;
+            this.showDeclineModal = false;
+            this.declineRequest(this.declineOrderId);
+        },
+
+        submitReasonForMultiple() {
+            this.declineMultiple = false;
+            this.showDeclineModal = false;
+            this.declineAll();
+        },
+
+        handleDecline(orderId) {
+            this.declineOrderId = orderId;
+            this.showDeclineModal = true;
+            this.declineReason = '';
+        },
+
         getStatusClass(status) {
             switch (status) {
                 case 'created':
@@ -316,5 +383,15 @@ export default {
 <style lang="scss">
 .is-rounded {
     border-radius: 4px;
+    overflow: hidden;
+}
+
+.decline-modal {
+    button {
+        min-width: 120px;
+    }
+}
+.jc-flex-end {
+    justify-content: flex-end;
 }
 </style>
