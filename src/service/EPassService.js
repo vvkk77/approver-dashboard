@@ -1,25 +1,38 @@
 import axios from 'axios';
-import { AUTHTOKEN } from '../utils/contants';
+import { AUTHTOKEN, SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
 
 const BASE_URL = 'https://viruscorona.co.in';
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers['content-type'] = 'application/json';
+
+const showLoader = () => {
+    window.dispatchEvent(new CustomEvent(SHOW_LOADING));
+};
+
+const hideLoader = () => {
+    window.dispatchEvent(new CustomEvent(HIDE_LOADING));
+};
+
 // Add a request interceptor
 axios.interceptors.request.use(
     function(config) {
+        showLoader();
         return config;
     },
     function(error) {
+        hideLoader();
         return Promise.reject(error);
     }
 );
 
 axios.interceptors.response.use(
     function(response) {
+        hideLoader();
         return response;
     },
     function(error) {
+        hideLoader();
         return Promise.reject(error);
     }
 );

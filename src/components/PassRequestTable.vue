@@ -25,9 +25,9 @@
                     </div>
                 </b-table-column>
 
-                <b-table-column field="orgName" label="Organization" sortable>{{
-                    props.row.orgName
-                }}</b-table-column>
+                <b-table-column field="orgName" label="Organization" sortable>
+                    {{ props.row.orgName }}
+                </b-table-column>
 
                 <b-table-column
                     field="requester"
