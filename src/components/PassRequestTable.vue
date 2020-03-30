@@ -141,11 +141,11 @@
             </template>
         </b-table>
 
-        <table-action-sheet
+        <pass-table-action-sheet
             @approve="approveAll"
             @decline="declineAll"
             v-if="checkedRows.length > 0"
-        ></table-action-sheet>
+        ></pass-table-action-sheet>
 
         <b-modal :active.sync="isModalActive" has-modal-card>
             <div class="modal-card">
@@ -173,13 +173,13 @@
 <script>
 import EPassService from '../service/EPassService';
 import Lozenge from './Lozenge.vue';
-import TableActionSheet from './TableActionSheet.vue';
+import PassTableActionSheet from './PassTableActionSheet.vue';
 import dayjs from 'dayjs';
 
 export default {
     name: 'PassRequestTable',
 
-    components: { TableActionSheet, Lozenge },
+    components: { PassTableActionSheet, Lozenge },
 
     data() {
         let orderList = localStorage.getItem('orderList');

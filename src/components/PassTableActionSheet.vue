@@ -29,7 +29,7 @@
 
 <script>
 export default {
-    name: 'TableActionSheet'
+    name: 'PassTableActionSheet'
 };
 </script>
 

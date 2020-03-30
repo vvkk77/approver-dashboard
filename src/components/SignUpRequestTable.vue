@@ -12,6 +12,7 @@
             :per-page="perPage"
             :sort-icon="sortIcon"
             :sort-icon-size="sortIconSize"
+            checkable
             checkbox-position="left"
         >
             <template slot-scope="props">
@@ -42,6 +43,37 @@
                         {{ props.row.orgName }}
                     </div>
                 </b-table-column>
+
+                <b-table-column label=" ">
+                    <b-dropdown aria-role="list" position="is-bottom-left">
+                        <button class="button is-small is-white" slot="trigger">
+                            <b-icon icon="dots-vertical"></b-icon>
+                        </button>
+
+                        <b-dropdown-item
+                            @click="approveSignUp(props.row.email)"
+                            aria-role="listitem"
+                        >
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon
+                                    icon="check-circle-outline"
+                                    type="is-success"
+                                ></b-icon>
+                                <span>Approve</span>
+                            </div>
+                        </b-dropdown-item>
+
+                        <b-dropdown-item aria-role="listitem" disabled>
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon
+                                    icon="close-circle-outline"
+                                    type="is-danger"
+                                ></b-icon>
+                                <span>Decline</span>
+                            </div>
+                        </b-dropdown-item>
+                    </b-dropdown>
+                </b-table-column>
             </template>
             <template slot="bottom-left">
                 <span class="is-size-7 has-text-weight-bold m-r-8"
@@ -62,7 +94,10 @@
             </template>
         </b-table>
 
-        <table-action-sheet v-if="checkedRows.length > 0"></table-action-sheet>
+        <sign-up-table-action-sheet
+            @approve="approveAll"
+            v-if="checkedRows.length > 0"
+        ></sign-up-table-action-sheet>
 
         <b-modal :active.sync="isModalActive" has-modal-card>
             <div class="modal-card">
@@ -72,17 +107,33 @@
                 </div>
             </div>
         </b-modal>
+
+        <b-modal :active="showProgess" has-modal-card>
+            <div class="modal-card">
+                <div class="modal-card-body is-rounded">
+                    <p class="title is-4">Submitting Requests</p>
+                    <b-progress
+                        :value="reqProgess"
+                        show-value
+                        type="is-success"
+                    >
+                        {{ reqIndex }} out of
+                        {{ checkedRows.length }}
+                    </b-progress>
+                </div>
+            </div>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import EPassService from '../service/EPassService';
-import TableActionSheet from './TableActionSheet.vue';
+import SignUpTableActionSheet from './SignUpTableActionSheet.vue';
 
 export default {
     name: 'PassRequestTable',
 
-    components: { TableActionSheet },
+    components: { SignUpTableActionSheet },
 
     data() {
         let signUpList = localStorage.getItem('signUpList');
@@ -103,8 +154,16 @@ export default {
             sortIcon: 'arrow-up',
             sortIconSize: 'is-small',
             currentPage: 1,
-            perPage: 10
+            perPage: 10,
+            reqIndex: 1,
+            showProgess: false
         };
+    },
+
+    computed: {
+        reqProgess() {
+            return Math.ceil((this.reqIndex / this.checkedRows.length) * 100);
+        }
     },
 
     methods: {
@@ -112,6 +171,32 @@ export default {
             const { data } = await EPassService.getSignUpRequests();
             this.signUpList = data.accounts;
             localStorage.setItem('signUpList', JSON.stringify(data.accounts));
+        },
+        async approveSignUp(email) {
+            await EPassService.approveAccount(email);
+            await this.fetchSignUpRequests();
+        },
+
+        async approveAll() {
+            try {
+                this.showProgess = true;
+                const emailList = this.checkedRows.map(i => i.email);
+
+                for (let index = 0; index < emailList.length; index++) {
+                    this.reqIndex = index + 1;
+                    const email = emailList[index];
+                    await EPassService.approveAccount(email);
+                }
+
+                await this.fetchSignUpRequests();
+
+                this.checkedRows = [];
+                this.showProgess = false;
+            } catch (error) {
+                this.showProgess = false;
+                this.checkedRows = [];
+                await this.fetchSignUpRequests();
+            }
         }
     },
 

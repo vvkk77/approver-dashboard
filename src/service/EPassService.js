@@ -69,6 +69,13 @@ export default {
         });
     },
 
+    approveAccount(email) {
+        return axios.post('/approveAccount', {
+            email,
+            authToken: localStorage.getItem(AUTHTOKEN)
+        });
+    },
+
     downloadQRCodes(orderID) {
         return axios.post('/downloadQRCodes', {
             orderID,
