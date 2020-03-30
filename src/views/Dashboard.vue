@@ -46,9 +46,15 @@ export default {
         OrdersTable
     },
     data() {
+        let reqOrderList = localStorage.getItem('reqOrderList');
+
+        if (reqOrderList) {
+            reqOrderList = JSON.parse(reqOrderList);
+        }
+
         return {
             openCR: false,
-            orderList: []
+            orderList: reqOrderList || []
         };
     },
     methods: {
@@ -60,6 +66,7 @@ export default {
             const { data } = await EPassService.getOrders();
 
             this.orderList = data.orders;
+            localStorage.setItem('reqOrderList', JSON.stringify(data.orders));
         },
 
         onOrderSuccess() {
