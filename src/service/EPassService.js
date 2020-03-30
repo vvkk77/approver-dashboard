@@ -41,8 +41,22 @@ export default {
         return axios.post('/signin', { email, password });
     },
 
-    register(name, email, password) {
-        return axios.post('/createAccount', { name, email, password });
+    createAccount({ name, email, password, orgID, orgName }) {
+        return axios.post('/createAccount', {
+            name,
+            email,
+            password,
+            orgID,
+            orgName
+        });
+    },
+
+    verifyOTP({ emailId, otp }) {
+        return axios.post('/verifyOTP', {
+            identifier: emailId,
+            accountIdentifierType: 'email',
+            otp
+        });
     },
 
     createOrder(formData) {

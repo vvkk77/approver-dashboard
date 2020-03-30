@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="login-form" v-if="registered">
         <div class="title">Login</div>
 
         <section>
@@ -31,6 +31,13 @@
                     ></b-input>
                 </b-field>
 
+                <div
+                    class="has-text-danger has-text-weight-semibold"
+                    v-if="apiError"
+                >
+                    {{ apiError }}
+                </div>
+
                 <div class="buttons m-y-48">
                     <b-button
                         :disabled="loading"
@@ -44,20 +51,39 @@
                     >
                 </div>
             </form>
+
+            <br />
+            <div class="is-size-6">
+                <span class="m-r-8">Forgot password?</span>
+                <a class="has-text-weight-semibold">Get reset link</a>
+            </div>
+
+            <br />
+
+            <div class="is-size-6">
+                <span class="m-r-8">New user?</span>
+                <a @click="registered = false" class="has-text-weight-semibold"
+                    >Register Now</a
+                >
+            </div>
         </section>
     </div>
+    <register-form @registered="registered = true" v-else></register-form>
 </template>
 
 <script>
 import { isValidEmail } from '../utils/helpers';
 import { AUTHTOKEN } from '../utils/contants';
 import EPassService from '../service/EPassService';
+import RegisterForm from './RegisterForm.vue';
 import dayjs from 'dayjs';
 
 export default {
     name: 'LoginForm',
+    components: { RegisterForm },
     data() {
         return {
+            registered: true,
             user: {
                 email: '',
                 pass: ''
@@ -66,7 +92,9 @@ export default {
                 email: '',
                 pass: ''
             },
-            loading: false
+            loading: false,
+
+            apiError: null
         };
     },
     methods: {
@@ -118,6 +146,23 @@ export default {
                 this.$router.replace('/');
             } catch (error) {
                 this.loading = false;
+                this.apiError = 'Something went wrong';
+
+                if (error && error.response && error.response.data.message) {
+                    const EXCEPTION =
+                        'Error Creating accountjava.lang.RuntimeException:';
+
+                    const errorMessage = error.response.data.message;
+
+                    if (errorMessage.indexOf(EXCEPTION) > -1) {
+                        this.apiError = errorMessage.replace(EXCEPTION, '');
+                    }
+
+                    if (errorMessage.indexOf('No account for email') > -1) {
+                        this.apiError =
+                            'Username or Password is incorrect! Please Try again.';
+                    }
+                }
             }
         }
     }
@@ -125,13 +170,18 @@ export default {
 </script>
 
 <style lang="scss">
-section {
-    margin-top: 60px;
-    button {
-        height: 40px;
+.login-form {
+    section {
+        margin-top: 60px;
+        button {
+            height: 40px;
+        }
+        .label {
+            font-weight: 600;
+        }
     }
-    .label {
-        font-weight: 600;
-    }
+}
+.m-r-8 {
+    margin-right: 8px;
 }
 </style>

@@ -5,7 +5,7 @@
             :data="data"
             :paginated="isPaginated"
             :pagination-position="paginationPosition"
-            :pagination-simple="isPaginationSimple"
+            :pagination-simple="false"
             :per-page="perPage"
         >
             <template slot-scope="props">
@@ -25,9 +25,8 @@
                                 ? 'primary'
                                 : 'warning'
                         "
+                        >{{ props.row.orderType | formatRequestLabel }}</lozenge
                     >
-                        {{ props.row.orderType | formatRequestLabel }}
-                    </lozenge>
                 </b-table-column>
 
                 <b-table-column
@@ -61,7 +60,9 @@
             </template>
 
             <template slot="bottom-left">
-                <span class="is-6">Request per page:</span>
+                <span class="is-size-7 has-text-weight-bold m-r-8"
+                    >Request per page:</span
+                >
                 <b-select
                     placeholder="Select a character"
                     size="is-small"
@@ -95,7 +96,6 @@ export default {
     data() {
         return {
             isPaginated: true,
-            isPaginationSimple: false,
             paginationPosition: 'bottom',
             currentPage: 1,
             perPage: 10
@@ -135,9 +135,11 @@ export default {
                 case 'approved':
                     return 'success';
             }
+
+            return 'primary';
         }
     }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss"></style>

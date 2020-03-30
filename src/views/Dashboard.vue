@@ -25,6 +25,7 @@
             <orders-table :data="orderList" v-else></orders-table>
         </div>
         <create-request
+            @close="openCR = false"
             @success="onOrderSuccess"
             v-if="openCR"
         ></create-request>
