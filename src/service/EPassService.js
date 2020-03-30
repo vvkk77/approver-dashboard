@@ -96,6 +96,13 @@ export default {
         });
     },
 
+    downloadOrderFile(orderID) {
+        return axios.post('/downloadOrderFile', {
+            orderID,
+            authToken: localStorage.getItem(AUTHTOKEN)
+        });
+    },
+
     getSignUpRequests() {
         return axios.post('/getAllAccountsPendingVerification', {
             authToken: localStorage.getItem(AUTHTOKEN)

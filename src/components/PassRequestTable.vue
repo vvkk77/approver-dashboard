@@ -79,6 +79,16 @@
                             <b-icon icon="dots-vertical"></b-icon>
                         </button>
 
+                        <b-dropdown-item
+                            @click="downloadOrderFile(props.row.id)"
+                            aria-role="listitem"
+                        >
+                            <div class="is-flex dropdown-menu-item">
+                                <b-icon icon="file" type="is-primary"></b-icon>
+                                <span>View Requests</span>
+                            </div>
+                        </b-dropdown-item>
+
                         <template v-if="props.row.orderStatus === 'created'">
                             <b-dropdown-item
                                 @click="approveRequest(props.row.id)"
@@ -365,6 +375,23 @@ export default {
                 showSuccess(`QR codes downloaded successfully`);
             } catch (error) {
                 showError(`Unable to download QR codes`);
+            }
+        },
+
+        async downloadOrderFile(orderId) {
+            try {
+                const { data } = await EPassService.downloadOrderFile(orderId);
+                const url = data.processedS3URL;
+
+                const ele = document.createElement('a');
+                ele.setAttribute('download', 'download');
+                ele.href = url;
+
+                ele.click();
+
+                showSuccess(`Request file downloaded successfully`);
+            } catch (error) {
+                showError(`Unable to download request file`);
             }
         },
 
