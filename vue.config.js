@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
     devServer: {
         port: 9090,
@@ -13,6 +15,25 @@ module.exports = {
             return args;
         });
     },
+
+    pwa: {
+        workboxOptions: {
+            skipWaiting: true
+        }
+    },
+
+    configureWebpack: {
+        performance: {
+            maxEntrypointSize: 512000,
+            maxAssetSize: 512000
+        },
+        plugins: [
+            new webpack.DefinePlugin({
+                __VERSION__: JSON.stringify(process.env.npm_package_version)
+            })
+        ]
+    },
+
     pluginOptions: {
         i18n: {
             locale: 'en',
