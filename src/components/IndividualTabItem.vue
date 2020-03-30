@@ -127,7 +127,9 @@
                 </b-table-column>
             </template>
             <template slot="bottom-left">
-                <span class="is-6">Request per page:</span>
+                <span class="is-size-7 has-text-weight-bold m-r-8"
+                    >Request per page:</span
+                >
                 <b-select
                     placeholder="Select a character"
                     size="is-small"
