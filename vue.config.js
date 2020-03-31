@@ -7,9 +7,8 @@ module.exports = {
             poll: true
         }
     },
-    publicPath: './',  publicPath: process.env.NODE_ENV === 'production'
-    ? '/approver-dashboard/'
-    : '/',
+    publicPath:
+        process.env.NODE_ENV === 'production' ? '/approver-dashboard/' : '/',
 
     chainWebpack: config => {
         config.plugin('html').tap(args => {

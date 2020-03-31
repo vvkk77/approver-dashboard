@@ -47,7 +47,7 @@ export default {
         );
     },
     signIn(email, password) {
-        return axios.post('/signin', { email, password });
+        return axios.post('/signin', { email, password, accountType: 'admin' });
     },
 
     createAccount({ name, email, password, orgID, orgName }) {
