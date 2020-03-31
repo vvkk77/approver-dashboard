@@ -1,7 +1,9 @@
 const webpack = require('webpack');
 
 module.exports = {
-    publicPath: './',
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/requester-dashboard/'
+    : '/',
 
     chainWebpack: config => {
         config.plugin('html').tap(args => {
