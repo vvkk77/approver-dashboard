@@ -51,7 +51,7 @@ export default {
         );
     },
     signIn(email, password) {
-        return axios.post('/signin', { email, password });
+        return axios.post('/signin', { email, password, accountType: 'user' });
     },
 
     createAccount({ name, email, password, orgID, orgName }) {
@@ -68,7 +68,8 @@ export default {
         return axios.post('/verifyOTP', {
             identifier: emailId,
             accountIdentifierType: 'email',
-            otp
+            otp,
+            accountType: 'user'
         });
     },
 
