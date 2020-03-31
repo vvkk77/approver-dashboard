@@ -52,7 +52,7 @@
                 </div>
             </form>
 
-            <br />
+            <!-- <br />
             <div class="is-size-6">
                 <span class="m-r-8">Forgot password?</span>
                 <a class="has-text-weight-semibold">Get reset link</a>
@@ -65,7 +65,7 @@
                 <a @click="registered = false" class="has-text-weight-semibold"
                     >Register Now</a
                 >
-            </div>
+            </div>-->
         </section>
     </div>
     <register-form @registered="registered = true" v-else></register-form>

@@ -13,48 +13,57 @@
             </div>
 
             <div class="is-flex">
-                <b-field grouped>
-                    <p class="control">
-                        <b-dropdown aria-role="list" position="is-bottom-left">
-                            <button
-                                class="button"
-                                slot="trigger"
-                                slot-scope="{ active }"
+                <transition name="fade">
+                    <b-field grouped v-if="requestType === 'pass'">
+                        <p class="control">
+                            <b-dropdown
+                                aria-role="list"
+                                position="is-bottom-left"
                             >
-                                <span>Filter</span>
-                                <b-icon
-                                    :icon="active ? 'menu-up' : 'menu-down'"
-                                ></b-icon>
-                            </button>
+                                <button
+                                    class="button"
+                                    slot="trigger"
+                                    slot-scope="{ active }"
+                                >
+                                    <span>Filter</span>
+                                    <b-icon
+                                        :icon="active ? 'menu-up' : 'menu-down'"
+                                    ></b-icon>
+                                </button>
 
-                            <b-dropdown-item aria-role="listitem" value
-                                >Action</b-dropdown-item
-                            >
-                            <b-dropdown-item aria-role="listitem" value
-                                >Another action</b-dropdown-item
-                            >
-                            <b-dropdown-item aria-role="listitem" value
-                                >Something else</b-dropdown-item
-                            >
-                        </b-dropdown>
-                    </p>
+                                <b-dropdown-item aria-role="listitem" value
+                                    >Action</b-dropdown-item
+                                >
+                                <b-dropdown-item aria-role="listitem" value
+                                    >Another action</b-dropdown-item
+                                >
+                                <b-dropdown-item aria-role="listitem" value
+                                    >Something else</b-dropdown-item
+                                >
+                            </b-dropdown>
+                        </p>
 
-                    <b-field>
-                        <b-input
-                            icon="magnify"
-                            icon-clickable
-                            placeholder="Search..."
-                            type="search"
-                        ></b-input>
+                        <b-field>
+                            <b-input
+                                icon="magnify"
+                                icon-clickable
+                                placeholder="Search..."
+                                type="search"
+                            ></b-input>
+                        </b-field>
                     </b-field>
-                </b-field>
+                </transition>
             </div>
         </div>
 
         <br />
 
-        <pass-request-table v-if="requestType === 'pass'"></pass-request-table>
-        <sign-up-request-table v-else></sign-up-request-table>
+        <transition mode="out-in" name="fade">
+            <pass-request-table
+                v-if="requestType === 'pass'"
+            ></pass-request-table>
+            <sign-up-request-table v-else></sign-up-request-table>
+        </transition>
     </div>
 </template>
 

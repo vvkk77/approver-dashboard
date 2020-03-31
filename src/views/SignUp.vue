@@ -75,6 +75,7 @@ export default {
 .sign-up-form-container {
     padding: 60px 36px;
     background-color: #f5f5f5;
+    overflow: auto;
 }
 
 .sign-up-info-container {
