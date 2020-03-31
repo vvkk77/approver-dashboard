@@ -136,9 +136,7 @@
                                 icon="check-circle"
                                 type="is-success"
                             ></b-icon>
-                            <span class="subtitle is-6">
-                                {{ file.name }}
-                            </span>
+                            <span class="subtitle is-6">{{ file.name }}</span>
                         </div>
                     </b-step-item>
                 </b-steps>
@@ -301,7 +299,9 @@ export default {
 
 <style lang="scss">
 .create-request-container {
-    margin-top: 2rem;
+    padding: 2rem 0;
+    overflow: scroll;
+    height: 100%;
 }
 
 .reason-list-container {

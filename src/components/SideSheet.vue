@@ -31,16 +31,22 @@ export default {
     },
 
     mounted() {
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('sheet-open');
     },
 
     destroyed() {
-        document.body.style.overflow = null;
+        document.body.classList.remove('sheet-open');
     }
 };
 </script>
 
 <style lang="scss">
+.sheet-open {
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+}
+
 .side-sheet {
     top: 0;
     position: fixed;
