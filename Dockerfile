@@ -6,7 +6,7 @@ ENV NODE_OPTIONS "--max-old-space-size=1792"
 
 # copy the project files
 COPY ${WORK_DIR} .
-RUN npm install && run build
+RUN yarn install && yarn run build
 
 # Create runtime image
 FROM nginx:mainline-alpine 
