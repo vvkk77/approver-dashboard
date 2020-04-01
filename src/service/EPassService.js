@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
 import { getAuthToken } from '../utils/session';
 
-const BASE_URL = 'https://epassapi.egovernments.org/ecurfew';
+const BASE_URL = process.env.API_BASE_URL;
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers['content-type'] = 'application/json';
