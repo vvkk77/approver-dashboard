@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import EPassService from './service/EPassService';
 import LoadingBar from './components/LoadingBar.vue';
 import { SHOW_LOADING, HIDE_LOADING } from './utils/contants';
+import { isSessionValid } from './utils/session';
 
 export default {
     name: 'App',
@@ -24,7 +24,7 @@ export default {
     },
 
     created() {
-        if (this.$route.path !== '/signup' && !EPassService.isSessionValid()) {
+        if (this.$route.path !== '/signup' && !isSessionValid()) {
             this.$router.replace('/signup');
         }
 

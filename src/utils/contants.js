@@ -1,4 +1,4 @@
-export const AUTHTOKEN = 'authtoken';
+export const AUTHTOKEN = 'auth-token';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';

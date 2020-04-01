@@ -182,8 +182,8 @@
 
 <script>
 import SideSheet from './SideSheet.vue';
-import { AUTHTOKEN } from '../utils/contants';
 import EPassService from '../service/EPassService';
+import { getAuthToken } from '../utils/session';
 
 export default {
     name: 'CreateRequest',
@@ -280,7 +280,7 @@ export default {
             formData.append('file', this.file);
             formData.append('orderType', this.passType);
             formData.append('purpose', this.selectedReason);
-            formData.append('authToken', localStorage.getItem(AUTHTOKEN));
+            formData.append('authToken', getAuthToken());
 
             this.loading = true;
 

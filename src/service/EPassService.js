@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { AUTHTOKEN, SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
+import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
+import { getAuthToken } from '../utils/session';
 
 const BASE_URL = 'https://viruscorona.co.in';
 
@@ -42,14 +43,6 @@ axios.interceptors.response.use(
 );
 
 export default {
-    isSessionValid() {
-        const expiry = localStorage.getItem('expiry');
-        return (
-            localStorage.getItem(AUTHTOKEN) &&
-            expiry &&
-            new Date(expiry) > Date.now()
-        );
-    },
     signIn(email, password) {
         return axios.post('/signin', { email, password, accountType: 'user' });
     },
@@ -80,7 +73,7 @@ export default {
     downloadQRCodes(orderID) {
         return axios.post('/downloadQRCodes', {
             orderID,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
@@ -90,7 +83,7 @@ export default {
 
         return axios.post('/getOrders', {
             accountID,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     }
 };

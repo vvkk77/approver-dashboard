@@ -1,8 +1,10 @@
 const webpack = require('webpack');
 
+const APPLICATION_PATH =
+    process.env.NODE_ENV === 'production' ? '/requester-dashboard/' : '/';
+
 module.exports = {
-    publicPath:
-        process.env.NODE_ENV === 'production' ? '/requester-dashboard/' : '/',
+    publicPath: APPLICATION_PATH,
 
     chainWebpack: config => {
         config.plugin('html').tap(args => {
@@ -24,7 +26,10 @@ module.exports = {
         },
         plugins: [
             new webpack.DefinePlugin({
-                __VERSION__: JSON.stringify(process.env.npm_package_version)
+                __VERSION__: JSON.stringify(process.env.npm_package_version),
+                'process.env.__APPLICATION_PATH__': JSON.stringify(
+                    APPLICATION_PATH
+                )
             })
         ]
     },

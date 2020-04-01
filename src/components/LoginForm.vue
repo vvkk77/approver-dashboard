@@ -73,10 +73,9 @@
 
 <script>
 import { isValidEmail } from '../utils/helpers';
-import { AUTHTOKEN } from '../utils/contants';
 import EPassService from '../service/EPassService';
 import RegisterForm from './RegisterForm.vue';
-import dayjs from 'dayjs';
+import { saveAuthToken } from '../utils/session';
 
 export default {
     name: 'LoginForm',
@@ -138,10 +137,8 @@ export default {
 
                 userInfo.email = this.user.email;
 
-                localStorage.setItem(AUTHTOKEN, authToken);
+                saveAuthToken(authToken);
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-                localStorage.setItem('expiry', dayjs(new Date()).add(1, 'day'));
 
                 this.$router.replace('/');
             } catch (error) {

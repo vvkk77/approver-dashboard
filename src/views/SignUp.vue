@@ -28,6 +28,8 @@
 
 <script>
 import LoginForm from '../components/LoginForm.vue';
+import { clearSession } from '../utils/session';
+
 export default {
     name: 'SignUp',
     components: { LoginForm },
@@ -54,6 +56,7 @@ export default {
     },
     created() {
         localStorage.clear();
+        clearSession();
     }
 };
 </script>
