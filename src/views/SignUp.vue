@@ -3,12 +3,16 @@
         <div class="columns">
             <div class="column full-height is-three-fifths">
                 <div class="sign-up-info-container full-height">
-                    <img
-                        alt
-                        class="logo"
-                        src="../assets/logo.png"
-                        width="120"
-                    />
+                    <div class="is-flex ai-center logo-container">
+                        <img
+                            alt
+                            class="logo"
+                            src="../assets/logo.png"
+                            width="132"
+                        />
+                        <div class="seperator"></div>
+                        <div class="title is-4">Approver Dashboard</div>
+                    </div>
 
                     <div class="title is-5">{{ typeText }}</div>
 
@@ -85,8 +89,16 @@ export default {
     padding: 60px;
     position: relative;
 
-    .logo {
-        margin-bottom: 16px;
+    .title.is-5 {
+        line-height: 1.5;
+    }
+
+    .logo-container {
+        margin-bottom: 2rem;
+
+        .seperator {
+            height: 3rem;
+        }
     }
 
     .login-bg {

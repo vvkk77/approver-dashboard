@@ -32,7 +32,7 @@
                 </b-field>
 
                 <div
-                    class="has-text-danger has-text-weight-semibold"
+                    class="is-size-7 has-text-danger has-text-weight-semibold"
                     v-if="apiError"
                 >
                     {{ apiError }}
@@ -59,6 +59,7 @@
 import EPassService from '../service/EPassService';
 import { saveAuthToken } from '../utils/session';
 import { isValidEmail } from '../utils/helpers';
+import { getError } from '../utils/error-handler';
 
 export default {
     name: 'LoginForm',
@@ -103,6 +104,7 @@ export default {
         },
 
         async login() {
+            this.apiError = null;
             if (!this.isValid()) {
                 return;
             }
@@ -123,27 +125,7 @@ export default {
                 this.$router.replace('/');
             } catch (error) {
                 this.loading = false;
-                this.apiError = 'Something went wrong';
-
-                if (error && error.response && error.response.data.message) {
-                    const EXCEPTION =
-                        'Error Creating accountjava.lang.RuntimeException:';
-
-                    if (error.response.data.message.indexOf(EXCEPTION) > -1) {
-                        this.apiError = error.response.data.message.replace(
-                            EXCEPTION,
-                            ''
-                        );
-                    }
-
-                    if (
-                        error.response.data.message.indexOf(
-                            'No account for email'
-                        ) > -1
-                    ) {
-                        this.apiError = `Account with email: ${this.user.email} does not exist`;
-                    }
-                }
+                this.apiError = getError(error);
             }
         }
     }
