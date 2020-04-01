@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { clearSession } from '../utils/session';
 export default {
     name: 'AppHeader',
     data() {
@@ -75,6 +76,7 @@ export default {
     },
     methods: {
         logout() {
+            clearSession();
             localStorage.clear();
             window.location.reload();
         }

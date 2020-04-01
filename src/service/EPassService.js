@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { AUTHTOKEN, SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
+import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
+import { getAuthToken } from '../utils/session';
 
 const BASE_URL = 'https://viruscorona.co.in';
 
@@ -38,14 +39,6 @@ axios.interceptors.response.use(
 );
 
 export default {
-    isSessionValid() {
-        const expiry = localStorage.getItem('expiry');
-        return (
-            localStorage.getItem(AUTHTOKEN) &&
-            expiry &&
-            new Date(expiry) > Date.now()
-        );
-    },
     signIn(email, password) {
         return axios.post('/signin', { email, password, accountType: 'admin' });
     },
@@ -70,7 +63,7 @@ export default {
 
     getAllOrders() {
         return axios.post('/getAllOrders', {
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
@@ -78,34 +71,40 @@ export default {
         return axios.post('/approveOrder', {
             orderID,
             orderAction,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
     approveAccount(email) {
         return axios.post('/approveAccount', {
             email,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
     downloadQRCodes(orderID) {
         return axios.post('/downloadQRCodes', {
             orderID,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
     downloadOrderFile(orderID) {
         return axios.post('/downloadOrderFile', {
             orderID,
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
         });
     },
 
     getSignUpRequests() {
         return axios.post('/getAllAccountsPendingVerification', {
-            authToken: localStorage.getItem(AUTHTOKEN)
+            authToken: getAuthToken()
+        });
+    },
+
+    getApproverUserProfile() {
+        return axios.post('/getApproverUserProfile', {
+            authToken: getAuthToken()
         });
     }
 };

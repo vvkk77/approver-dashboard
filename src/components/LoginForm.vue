@@ -72,11 +72,10 @@
 </template>
 
 <script>
-import { isValidEmail } from '../utils/helpers';
-import { AUTHTOKEN } from '../utils/contants';
 import EPassService from '../service/EPassService';
 import RegisterForm from './RegisterForm.vue';
-import dayjs from 'dayjs';
+import { saveAuthToken } from '../utils/session';
+import { isValidEmail } from '../utils/helpers';
 
 export default {
     name: 'LoginForm',
@@ -138,10 +137,9 @@ export default {
 
                 userInfo.email = this.user.email;
 
-                localStorage.setItem(AUTHTOKEN, authToken);
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                saveAuthToken(authToken);
 
-                localStorage.setItem('expiry', dayjs(new Date()).add(1, 'day'));
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
                 this.$router.replace('/');
             } catch (error) {

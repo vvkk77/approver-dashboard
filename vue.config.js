@@ -1,5 +1,8 @@
 const webpack = require('webpack');
 
+const APPLICATION_PATH =
+    process.env.NODE_ENV === 'production' ? '/approver-dashboard/' : '/';
+
 module.exports = {
     devServer: {
         port: 9090,
@@ -7,8 +10,7 @@ module.exports = {
             poll: true
         }
     },
-    publicPath:
-        process.env.NODE_ENV === 'production' ? '/approver-dashboard/' : '/',
+    publicPath: APPLICATION_PATH,
 
     chainWebpack: config => {
         config.plugin('html').tap(args => {
@@ -30,7 +32,10 @@ module.exports = {
         },
         plugins: [
             new webpack.DefinePlugin({
-                __VERSION__: JSON.stringify(process.env.npm_package_version)
+                __VERSION__: JSON.stringify(process.env.npm_package_version),
+                'process.env.__APPLICATION_PATH__': JSON.stringify(
+                    APPLICATION_PATH
+                )
             })
         ]
     },
