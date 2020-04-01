@@ -1,5 +1,5 @@
 <template>
-    <div class="register-form" v-if="!openOTP">
+    <div class="register-form">
         <div class="title">Register</div>
 
         <section>
@@ -84,6 +84,13 @@
                     ></b-input>
                 </b-field>
 
+                <div
+                    class="is-size-7 has-text-danger has-text-weight-semibold"
+                    v-if="apiError"
+                >
+                    {{ apiError }}
+                </div>
+
                 <div class="buttons m-y-48">
                     <b-button
                         :disabled="loading"
@@ -97,24 +104,26 @@
                     >
                 </div>
             </form>
+            <br />
+            <div class="is-size-6">
+                <span class="m-r-8">Have a verified account already?</span>
+                <router-link class="has-text-weight-semibold" to="/login"
+                    >Login</router-link
+                >
+            </div>
         </section>
     </div>
-
-    <verify-otp-form
-        :emailId="user.email"
-        @verified="$emit('registered')"
-        v-else
-    ></verify-otp-form>
 </template>
 
 <script>
 import { isValidEmail } from '../utils/helpers';
 import EPassService from '../service/EPassService';
-import VerifyOTPForm from './VerifyOTPForm';
+import dotProp from 'dot-prop';
+import { getError } from '../utils/error-handler';
 
 export default {
     name: 'RegistrationForm',
-    components: { 'verify-otp-form': VerifyOTPForm },
+    components: {},
 
     data() {
         return {
@@ -135,8 +144,7 @@ export default {
                 cpass: ''
             },
             loading: false,
-
-            openOTP: false
+            apiError: null
         };
     },
     methods: {
@@ -219,8 +227,18 @@ export default {
 
                 this.loading = false;
 
-                this.openOTP = true;
+                sessionStorage.setItem('email', email.trim());
+                this.$router.push('/verify-otp');
             } catch (error) {
+                const message = dotProp.get(error, 'response.data.message');
+                if (message && message.indexOf('verify your email') > -1) {
+                    await EPassService.requestOTP(this.user.email.trim());
+                    sessionStorage.setItem('email', this.user.email.trim());
+                    this.$router.push('/verify-otp');
+                } else {
+                    this.apiError = getError(error);
+                }
+
                 this.loading = false;
             }
         }

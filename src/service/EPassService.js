@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
 import { getAuthToken } from '../utils/session';
+import dotprop from 'dot-prop';
 
 const BASE_URL = process.env.API_BASE_URL;
 
@@ -37,6 +38,12 @@ axios.interceptors.response.use(
         return response;
     },
     function(error) {
+        const message = dotprop.get(error, 'response.data.message');
+        if (String(message).indexOf('invalid token') > -1) {
+            window.dispatchEvent(new CustomEvent('LOGIN'));
+            return Promise.reject();
+        }
+
         hideLoader();
         return Promise.reject(error);
     }
@@ -61,8 +68,22 @@ export default {
         return axios.post('/verifyOTP', {
             identifier: emailId,
             accountIdentifierType: 'email',
-            otp,
-            accountType: 'user'
+            otp
+        });
+    },
+
+    requestOTP(emailId) {
+        return axios.post('/requestOTP', {
+            identifier: emailId,
+            accountIdentifierType: 'email'
+        });
+    },
+
+    updatePassword({ email, password, authToken }) {
+        return axios.post('/updatePassword', {
+            email,
+            password,
+            authToken
         });
     },
 

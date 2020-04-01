@@ -3,12 +3,16 @@
         <div class="columns">
             <div class="column full-height is-three-fifths">
                 <div class="sign-up-info-container full-height">
-                    <img
-                        alt
-                        class="logo"
-                        src="../assets/logo.png"
-                        width="120"
-                    />
+                    <div class="is-flex ai-center logo-container">
+                        <img
+                            alt
+                            class="logo"
+                            src="../assets/logo.png"
+                            width="132"
+                        />
+                        <div class="seperator"></div>
+                        <div class="title is-4">Applicant Dashboard</div>
+                    </div>
 
                     <div class="title is-5">{{ typeText }}</div>
 
@@ -19,7 +23,7 @@
             </div>
             <div class="column full-height">
                 <div class="sign-up-form-container full-height">
-                    <login-form></login-form>
+                    <slot></slot>
                 </div>
             </div>
         </div>
@@ -27,12 +31,10 @@
 </template>
 
 <script>
-import LoginForm from '../components/LoginForm.vue';
 import { clearSession } from '../utils/session';
 
 export default {
-    name: 'SignUp',
-    components: { LoginForm },
+    name: 'SignUpLayout',
     data() {
         return {
             welcomeText: 'Get a pass to commute during the COVID pandemic',
@@ -83,8 +85,17 @@ export default {
     padding: 60px;
     position: relative;
 
-    .logo {
-        margin-bottom: 16px;
+    .title.is-5 {
+        line-height: 1.5;
+    }
+
+    .logo-container {
+        margin-bottom: 2rem;
+
+        .seperator {
+            height: 3rem;
+            background-color: #ededed;
+        }
     }
 
     .login-bg {

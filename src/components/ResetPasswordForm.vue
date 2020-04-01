@@ -1,22 +1,13 @@
 <template>
     <div class="login-form">
-        <div class="title">Login</div>
+        <div class="title">Reset password</div>
 
+        <div class="subtitle is-6">
+            Enter OTP sent to:
+            <span>{{ emailId }}</span>
+        </div>
         <section>
             <form @submit.prevent.stop>
-                <b-field
-                    :message="error.email"
-                    :type="{ 'is-danger': !!error.email }"
-                    label="Email"
-                >
-                    <b-input
-                        @blur="validateEmail"
-                        @focus="error.email = ''"
-                        type="email"
-                        v-model="user.email"
-                    ></b-input>
-                </b-field>
-
                 <b-field
                     :message="error.pass"
                     :type="{ 'is-danger': !!error.pass }"
@@ -31,20 +22,25 @@
                     ></b-input>
                 </b-field>
 
+                <b-field
+                    :message="error.cpass"
+                    :type="{ 'is-danger': !!error.cpass }"
+                    label="Confirm Password"
+                >
+                    <b-input
+                        @blur="confirmPassword"
+                        @focus="error.cpass = ''"
+                        password-reveal
+                        type="password"
+                        v-model="user.cpass"
+                    ></b-input>
+                </b-field>
+
                 <div
                     class="is-size-7 has-text-danger has-text-weight-semibold"
                     v-if="apiError"
                 >
                     {{ apiError }}
-                </div>
-
-                <div class="is-size-6" v-if="verifyEmailError">
-                    <span class="m-r-8">Verify email?</span>
-                    <router-link
-                        class="has-text-weight-semibold"
-                        to="/verify-otp"
-                        >Click here</router-link
-                    >
                 </div>
 
                 <div class="buttons m-y-48">
@@ -84,9 +80,7 @@
 </template>
 
 <script>
-import { isValidEmail } from '../utils/helpers';
 import EPassService from '../service/EPassService';
-import { saveAuthToken } from '../utils/session';
 import { getError } from '../utils/error-handler';
 
 export default {
@@ -95,41 +89,22 @@ export default {
     data() {
         return {
             user: {
-                email: '',
-                pass: ''
+                pass: '',
+                cpass: ''
             },
             error: {
-                email: '',
-                pass: ''
+                pass: '',
+                cpass: ''
             },
             loading: false,
 
-            apiError: null
+            apiError: null,
+            email: null,
+            auth: null
         };
-    },
-    computed: {
-        verifyEmailError() {
-            return (
-                this.apiError && this.apiError.indexOf('verify your email') > -1
-            );
-        }
-    },
-
-    watch: {
-        verifyEmailError() {
-            sessionStorage.setItem('email', this.user.email);
-        }
     },
 
     methods: {
-        validateEmail() {
-            this.error.email = '';
-            if (!this.user.email) {
-                this.error.email = 'Please enter email id';
-            } else if (!isValidEmail(this.user.email.trim())) {
-                this.error.email = 'Invalid email address';
-            }
-        },
         validatePassword() {
             this.error.pass = '';
             if (!this.user.pass) {
@@ -137,11 +112,18 @@ export default {
             }
         },
 
-        isValid() {
-            this.validateEmail();
+        confirmPassword() {
+            this.error.cpass = '';
             this.validatePassword();
 
-            return !this.error.email && !this.error.pass;
+            if (!this.error.pass && this.user.pass !== this.user.cpass) {
+                this.error.cpass = "Password doesn't match";
+            }
+        },
+
+        isValid() {
+            this.confirmPassword();
+            return !this.error.cpass && !this.error.pass;
         },
 
         async login() {
@@ -152,43 +134,27 @@ export default {
 
             this.loading = true;
             try {
-                const { data } = await EPassService.signIn(
-                    this.user.email.trim(),
-                    this.user.pass.trim()
-                );
+                await EPassService.updatePassword({
+                    email: this.email.trim(),
+                    password: this.user.pass.trim(),
+                    authToken: this.auth.trim()
+                });
 
                 this.loading = false;
 
-                const { authToken, ...userInfo } = data;
-
-                userInfo.email = this.user.email;
-
-                saveAuthToken(authToken);
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-                this.$router.replace('/');
+                this.$router.replace('/login');
             } catch (error) {
                 this.loading = false;
                 this.apiError = getError(error);
             }
         }
+    },
+    created() {
+        this.email = sessionStorage.getItem('email');
+        this.auth = sessionStorage.getItem('auth');
+        sessionStorage.clear();
     }
 };
 </script>
 
-<style lang="scss">
-.login-form {
-    section {
-        margin-top: 60px;
-        button {
-            height: 40px;
-        }
-        .label {
-            font-weight: 600;
-        }
-    }
-}
-.m-r-8 {
-    margin-right: 8px;
-}
-</style>
+<style lang="scss"></style>

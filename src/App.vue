@@ -2,7 +2,7 @@
     <div id="app">
         <router-view></router-view>
         <loading-bar
-            :alt="$route.path == '/signup'"
+            :alt="$route.path == '/login'"
             v-show="loading"
         ></loading-bar>
     </div>
@@ -11,7 +11,6 @@
 <script>
 import LoadingBar from './components/LoadingBar.vue';
 import { SHOW_LOADING, HIDE_LOADING } from './utils/contants';
-import { isSessionValid } from './utils/session';
 
 export default {
     name: 'App',
@@ -24,12 +23,11 @@ export default {
     },
 
     created() {
-        if (this.$route.path !== '/signup' && !isSessionValid()) {
-            this.$router.replace('/signup');
-        }
-
         window.addEventListener(SHOW_LOADING, () => (this.loading = true));
         window.addEventListener(HIDE_LOADING, () => (this.loading = false));
+        window.addEventListener('LOGIN', () => {
+            this.$router.replace('/login');
+        });
     }
 };
 </script>

@@ -24,18 +24,11 @@
                     ></b-input>
                 </b-field>
 
-                <div
-                    class="is-size-7 has-text-danger has-text-weight-semibold"
-                    v-if="apiError"
-                >
-                    {{ apiError }}
-                </div>
-
                 <div class="buttons m-y-48">
                     <b-button
                         :disabled="loading"
                         :loading="loading"
-                        @click="login"
+                        @click="verifyOTP"
                         class="has-text-weight-bold"
                         expanded
                         native-type="submit"
@@ -48,14 +41,18 @@
             <br />
             <div class="is-size-6">
                 <span class="m-r-8">Didn’t receive the OTP?</span>
-                <a class="has-text-weight-semibold">Resend OTP</a>
+                <a @click="resendOTP" class="has-text-weight-semibold"
+                    >Resend OTP</a
+                >
             </div>
 
             <br />
 
             <div class="is-size-6">
                 <span class="m-r-8">Incorrect email?</span>
-                <a class="has-text-weight-semibold">Change email</a>
+                <a @click="$router.go(-1)" class="has-text-weight-semibold"
+                    >Go Back</a
+                >
             </div>
         </section>
     </div>
@@ -64,23 +61,25 @@
 <script>
 import EPassService from '../service/EPassService';
 import dotprop from 'dot-prop';
+import { showSuccess } from '../utils/toast';
 
 export default {
     name: 'VerifyOTPForm',
-    props: {
-        emailId: String
-    },
+
     components: {},
     data() {
+        const email = sessionStorage.getItem('email');
+        sessionStorage.clear();
+
         return {
+            emailId: email,
             user: {
                 otp: ''
             },
             error: {
                 otp: ''
             },
-            loading: false,
-            apiError: null
+            loading: false
         };
     },
     methods: {
@@ -102,32 +101,52 @@ export default {
             return !this.error.otp;
         },
 
-        async login() {
+        async verifyOTP() {
             if (!this.isValid()) {
                 return;
             }
 
             this.loading = true;
             try {
-                await EPassService.verifyOTP({
+                const { data } = await EPassService.verifyOTP({
                     emailId: this.emailId,
                     otp: this.user.otp.trim()
                 });
 
                 this.loading = false;
 
-                this.$emit('verified');
+                if (this.$route.path.indexOf('reset-password') > -1) {
+                    sessionStorage.setItem('email', this.emailId);
+                    sessionStorage.setItem('auth', data.authToken);
+                    this.$router.replace('/reset-password/update');
+                } else this.$router.replace('/login');
             } catch (error) {
                 this.loading = false;
                 const message = dotprop.get(error, 'response.data.message');
                 if (message) {
-                    this.apiError = message;
+                    this.error.otp = message;
                 } else {
-                    this.apiError = 'Something went wrong';
+                    this.error.otp = 'Something went wrong';
                 }
             }
+        },
+
+        async resendOTP() {
+            try {
+                await EPassService.requestOTP(this.emailId);
+
+                showSuccess(`OTP sent to ${this.emailId}`);
+            } catch (error) {
+                showSuccess(`Unable to send OTP`);
+            }
         }
-    }
+    },
+    mounted() {
+        if (!this.emailId) {
+            this.$router.replace('/login');
+        }
+    },
+    created() {}
 };
 </script>
 
