@@ -102,7 +102,7 @@
 
     <verify-otp-form
         :emailId="user.email"
-        @verfied="$emit('registered')"
+        @verified="$emit('registered')"
         v-else
     ></verify-otp-form>
 </template>

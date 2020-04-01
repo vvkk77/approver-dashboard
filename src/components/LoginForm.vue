@@ -1,5 +1,5 @@
 <template>
-    <div class="login-form" v-if="registered">
+    <div class="login-form" v-if="registered && !verifyOTP">
         <div class="title">Login</div>
 
         <section>
@@ -32,7 +32,7 @@
                 </b-field>
 
                 <div
-                    class="has-text-danger has-text-weight-semibold"
+                    class="is-size-7 has-text-danger has-text-weight-semibold"
                     v-if="apiError"
                 >
                     {{ apiError }}
@@ -68,6 +68,11 @@
             </div>
         </section>
     </div>
+    <verify-o-t-p-form
+        :emailId="user.email"
+        @verified="verifyOTP = true"
+        v-else-if="verifyOTP"
+    ></verify-o-t-p-form>
     <register-form @registered="registered = true" v-else></register-form>
 </template>
 
@@ -75,14 +80,17 @@
 import { isValidEmail } from '../utils/helpers';
 import EPassService from '../service/EPassService';
 import RegisterForm from './RegisterForm.vue';
+import VerifyOTPForm from './VerifyOTPForm.vue';
 import { saveAuthToken } from '../utils/session';
 
 export default {
     name: 'LoginForm',
-    components: { RegisterForm },
+    components: { RegisterForm, VerifyOTPForm },
     data() {
         return {
             registered: true,
+            verifyOTP: false,
+
             user: {
                 email: '',
                 pass: ''
@@ -149,7 +157,13 @@ export default {
                     const EXCEPTION =
                         'Error Creating accountjava.lang.RuntimeException:';
 
+                    const VERIFY_EMAIL = 'Please verify your email';
+
                     const errorMessage = error.response.data.message;
+
+                    if (errorMessage.indexOf(VERIFY_EMAIL) > -1) {
+                        this.verifyOTP = true;
+                    }
 
                     if (errorMessage.indexOf(EXCEPTION) > -1) {
                         this.apiError = errorMessage.replace(EXCEPTION, '');

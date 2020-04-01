@@ -24,6 +24,13 @@
                     ></b-input>
                 </b-field>
 
+                <div
+                    class="is-size-7 has-text-danger has-text-weight-semibold"
+                    v-if="apiError"
+                >
+                    {{ apiError }}
+                </div>
+
                 <div class="buttons m-y-48">
                     <b-button
                         :disabled="loading"
@@ -56,6 +63,7 @@
 
 <script>
 import EPassService from '../service/EPassService';
+import dotprop from 'dot-prop';
 
 export default {
     name: 'VerifyOTPForm',
@@ -71,7 +79,8 @@ export default {
             error: {
                 otp: ''
             },
-            loading: false
+            loading: false,
+            apiError: null
         };
     },
     methods: {
@@ -107,9 +116,15 @@ export default {
 
                 this.loading = false;
 
-                this.$emit('verfied');
+                this.$emit('verified');
             } catch (error) {
                 this.loading = false;
+                const message = dotprop.get(error, 'response.data.message');
+                if (message) {
+                    this.apiError = message;
+                } else {
+                    this.apiError = 'Something went wrong';
+                }
             }
         }
     }
