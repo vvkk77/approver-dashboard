@@ -5,7 +5,7 @@ import { IS_PROD } from './helpers';
 const cookieOptions = {
     expires: 1,
     secure: IS_PROD,
-    path: process.env.__APPLICATION_PATH__
+    path: process.env.APPLICATION_PATH
 };
 
 export const isSessionValid = () => {
