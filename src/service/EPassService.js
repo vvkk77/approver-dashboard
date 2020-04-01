@@ -1,11 +1,15 @@
 import axios from 'axios';
 import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
 import { getAuthToken } from '../utils/session';
+import dotprop from 'dot-prop';
 
 const BASE_URL = process.env.API_BASE_URL;
-
-axios.defaults.baseURL = BASE_URL;
-axios.defaults.headers['content-type'] = 'application/json';
+const api = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+        'content-type': 'application/json'
+    }
+});
 
 const showLoader = () => {
     window.dispatchEvent(new CustomEvent(SHOW_LOADING));
@@ -16,7 +20,7 @@ const hideLoader = () => {
 };
 
 // Add a request interceptor
-axios.interceptors.request.use(
+api.interceptors.request.use(
     function(config) {
         showLoader();
         return config;
@@ -27,12 +31,18 @@ axios.interceptors.request.use(
     }
 );
 
-axios.interceptors.response.use(
+api.interceptors.response.use(
     function(response) {
         hideLoader();
         return response;
     },
     function(error) {
+        const message = dotprop.get(error, 'response.data.message');
+        if (String(message).indexOf('invalid token') > -1) {
+            window.dispatchEvent(new CustomEvent('LOGIN'));
+            return Promise.reject();
+        }
+
         hideLoader();
         return Promise.reject(error);
     }
@@ -40,11 +50,11 @@ axios.interceptors.response.use(
 
 export default {
     signIn(email, password) {
-        return axios.post('/signin', { email, password, accountType: 'admin' });
+        return api.post('/signin', { email, password, accountType: 'admin' });
     },
 
     createAccount({ name, email, password, orgID, orgName }) {
-        return axios.post('/createAccount', {
+        return api.post('/createAccount', {
             name,
             email,
             password,
@@ -54,7 +64,7 @@ export default {
     },
 
     verifyOTP({ emailId, otp }) {
-        return axios.post('/verifyOTP', {
+        return api.post('/verifyOTP', {
             identifier: emailId,
             accountIdentifierType: 'email',
             otp
@@ -62,13 +72,21 @@ export default {
     },
 
     getAllOrders() {
-        return axios.post('/getAllOrders', {
-            authToken: getAuthToken()
-        });
+        return api
+            .post('/getAllOrders', {
+                authToken: getAuthToken()
+            })
+            .then(req => {
+                localStorage.setItem(
+                    'orderList',
+                    JSON.stringify(req.data.orders)
+                );
+                return req;
+            });
     },
 
     approveOrder(orderID, orderAction) {
-        return axios.post('/approveOrder', {
+        return api.post('/approveOrder', {
             orderID,
             orderAction,
             authToken: getAuthToken()
@@ -76,35 +94,67 @@ export default {
     },
 
     approveAccount(email) {
-        return axios.post('/approveAccount', {
+        return api.post('/approveAccount', {
             email,
             authToken: getAuthToken()
         });
     },
 
     downloadQRCodes(orderID) {
-        return axios.post('/downloadQRCodes', {
+        return api.post('/downloadQRCodes', {
             orderID,
             authToken: getAuthToken()
         });
     },
 
     downloadOrderFile(orderID) {
-        return axios.post('/downloadOrderFile', {
+        return api.post('/downloadOrderFile', {
             orderID,
             authToken: getAuthToken()
         });
     },
 
     getSignUpRequests() {
-        return axios.post('/getAllAccountsPendingVerification', {
+        return api
+            .post('/getAllAccountsPendingVerification', {
+                authToken: getAuthToken()
+            })
+            .then(req => {
+                localStorage.setItem(
+                    'signUpList',
+                    JSON.stringify(req.data.accounts)
+                );
+                return req;
+            });
+    },
+
+    getAllOrganizations() {
+        return api
+            .post('/getAllOrganizations', {
+                authToken: getAuthToken()
+            })
+            .then(req => {
+                localStorage.setItem(
+                    'orgList',
+                    JSON.stringify(req.data.organizations)
+                );
+                return req;
+            });
+    },
+
+    setPassLimit(newLimit, organizationID) {
+        return api.post('/setPassLimit', {
+            newLimit,
+            organizationID,
             authToken: getAuthToken()
         });
     },
 
     getApproverUserProfile() {
-        return axios.post('/getApproverUserProfile', {
-            authToken: getAuthToken()
+        return api.post(`/getApproverUserProfile`, null, {
+            params: {
+                authToken: getAuthToken()
+            }
         });
     }
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="login-form" v-if="registered">
+    <div class="login-form">
         <div class="title">Login</div>
 
         <section>
@@ -51,35 +51,18 @@
                     >
                 </div>
             </form>
-
-            <!-- <br />
-            <div class="is-size-6">
-                <span class="m-r-8">Forgot password?</span>
-                <a class="has-text-weight-semibold">Get reset link</a>
-            </div>
-
-            <br />
-
-            <div class="is-size-6">
-                <span class="m-r-8">New user?</span>
-                <a @click="registered = false" class="has-text-weight-semibold"
-                    >Register Now</a
-                >
-            </div>-->
         </section>
     </div>
-    <register-form @registered="registered = true" v-else></register-form>
 </template>
 
 <script>
 import EPassService from '../service/EPassService';
-import RegisterForm from './RegisterForm.vue';
 import { saveAuthToken } from '../utils/session';
 import { isValidEmail } from '../utils/helpers';
 
 export default {
     name: 'LoginForm',
-    components: { RegisterForm },
+    components: {},
     data() {
         return {
             registered: true,
@@ -133,13 +116,9 @@ export default {
 
                 this.loading = false;
 
-                const { authToken, ...userInfo } = data;
-
-                userInfo.email = this.user.email;
+                const { authToken } = data;
 
                 saveAuthToken(authToken);
-
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
                 this.$router.replace('/');
             } catch (error) {

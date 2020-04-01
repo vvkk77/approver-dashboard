@@ -50,7 +50,7 @@
                         </div>
                     </b-table-column>
 
-                    <b-table-column label=" ">
+                    <b-table-column label=" " width="30">
                         <b-dropdown aria-role="list" position="is-bottom-left">
                             <button
                                 class="button is-small is-white"
@@ -113,15 +113,6 @@
             ></sign-up-table-action-sheet>
         </transition>
 
-        <b-modal :active.sync="isModalActive" has-modal-card>
-            <div class="modal-card">
-                <div class="modal-card-body">
-                    <p class="title is-4">Enter Reason</p>
-                    <p class="subtitle">Jeff Atwood</p>
-                </div>
-            </div>
-        </b-modal>
-
         <b-modal :active="showProgess" has-modal-card>
             <div class="modal-card">
                 <div class="modal-card-body is-rounded">
@@ -162,7 +153,6 @@ export default {
             signUpList: signUpList || [],
             checkedRows: [],
             loading: false,
-            isModalActive: false,
 
             isPaginated: true,
             isPaginationSimple: false,
@@ -189,10 +179,6 @@ export default {
             try {
                 const { data } = await EPassService.getSignUpRequests();
                 this.signUpList = data.accounts;
-                localStorage.setItem(
-                    'signUpList',
-                    JSON.stringify(data.accounts)
-                );
             } catch (error) {
                 showError(`Unable to fetch requests`);
             }

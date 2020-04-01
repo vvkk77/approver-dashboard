@@ -1,186 +1,243 @@
 <template>
     <div>
         <transition mode="out-in" name="fade">
-            <b-table
-                :checked-rows.sync="checkedRows"
-                :current-page.sync="currentPage"
-                :data="orderList"
-                :default-sort-direction="defaultSortDirection"
-                :is-row-checkable="row => row.orderStatus === 'created'"
-                :paginated="isPaginated"
-                :pagination-position="paginationPosition"
-                :pagination-simple="isPaginationSimple"
-                :per-page="perPage"
-                :sort-icon="sortIcon"
-                :sort-icon-size="sortIconSize"
-                checkable
-                checkbox-position="left"
-                v-if="orderList.length"
-            >
-                <template slot-scope="props">
-                    <b-table-column
-                        field="createdAt"
-                        label="Raised on"
-                        sortable
-                    >
-                        <div class="has-text-dark is-size-6">
-                            {{ props.row.createdAt | formatDate }}
+            <div v-if="orderList.length">
+                <div class="is-flex jc-space-between ai-center">
+                    <div class="is-flex">
+                        <div class="is-flex">
+                            <span class="m-r-8">Total pass requests:</span>
+                            <span class="has-text-weight-bold">{{
+                                orderList.length
+                            }}</span>
                         </div>
-                        <div class="has-text-grey is-size-6">
-                            {{ props.row.createdAt | formatTime }}
-                        </div>
-                    </b-table-column>
-
-                    <b-table-column
-                        field="orgName"
-                        label="Organization"
-                        sortable
-                        >{{ props.row.orgName }}</b-table-column
-                    >
-
-                    <b-table-column
-                        field="requester"
-                        label="Contact Email"
-                        sortable
-                    >
-                        <div class="has-text-dark is-size-6">
-                            {{ props.row.requester }}
-                        </div>
-                    </b-table-column>
-
-                    <b-table-column
-                        field="orderType"
-                        label="Pass Type"
-                        sortable
-                    >
-                        <lozenge
-                            :type="
-                                props.row.orderType == 'person'
-                                    ? 'primary'
-                                    : 'warning'
-                            "
-                        >
-                            {{ props.row.orderType | formatRequestLabel }}
-                        </lozenge>
-                    </b-table-column>
-
-                    <b-table-column
-                        field="requestCount"
-                        label="No. of Passes"
-                        numeric
-                        sortable
-                        >{{ props.row.requestCount }}</b-table-column
-                    >
-
-                    <b-table-column field="status" label="Status" sortable>
-                        <span
-                            :class="
-                                `has-text-${getStatusClass(
-                                    props.row.orderStatus
-                                )}`
-                            "
-                            class="has-text-weight-bold is-uppercase"
-                        >
-                            {{ props.row.orderStatus | formatStatusLabel }}
-                        </span>
-                    </b-table-column>
-                    <b-table-column label=" ">
-                        <b-dropdown
-                            :disabled="
-                                !!props.row.orderStatus.match(
-                                    'declined|approved'
-                                )
-                            "
-                            aria-role="list"
-                            position="is-bottom-left"
-                        >
-                            <button
-                                class="button is-small is-white"
-                                slot="trigger"
-                            >
-                                <b-icon icon="dots-vertical"></b-icon>
-                            </button>
-
-                            <b-dropdown-item
-                                @click="downloadOrderFile(props.row.id)"
-                                aria-role="listitem"
-                            >
-                                <div class="is-flex dropdown-menu-item">
-                                    <b-icon
-                                        icon="file"
-                                        type="is-primary"
-                                    ></b-icon>
-                                    <span>View Requests</span>
-                                </div>
-                            </b-dropdown-item>
-
-                            <template
-                                v-if="props.row.orderStatus === 'created'"
-                            >
-                                <b-dropdown-item
-                                    @click="approveRequest(props.row.id)"
-                                    aria-role="listitem"
+                    </div>
+                    <div class="is-flex">
+                        <b-field grouped>
+                            <p class="control">
+                                <b-dropdown
+                                    aria-role="list"
+                                    position="is-bottom-left"
                                 >
-                                    <div class="is-flex dropdown-menu-item">
+                                    <button
+                                        class="button"
+                                        slot="trigger"
+                                        slot-scope="{ active }"
+                                    >
+                                        <span>Filter</span>
                                         <b-icon
-                                            icon="check-circle-outline"
-                                            type="is-success"
+                                            :icon="
+                                                active ? 'menu-up' : 'menu-down'
+                                            "
                                         ></b-icon>
-                                        <span>Approve</span>
-                                    </div>
-                                </b-dropdown-item>
-                                <b-dropdown-item
-                                    @click="handleDecline(props.row.id)"
-                                    aria-role="listitem"
-                                >
-                                    <div class="is-flex dropdown-menu-item">
-                                        <b-icon
-                                            icon="close-circle-outline"
-                                            type="is-danger"
-                                        ></b-icon>
-                                        <span>Decline</span>
-                                    </div>
-                                </b-dropdown-item>
-                            </template>
+                                    </button>
 
-                            <template
-                                v-if="props.row.orderStatus === 'processed'"
+                                    <b-dropdown-item aria-role="listitem" value
+                                        >Action</b-dropdown-item
+                                    >
+                                    <b-dropdown-item aria-role="listitem" value
+                                        >Another action</b-dropdown-item
+                                    >
+                                    <b-dropdown-item aria-role="listitem" value
+                                        >Something else</b-dropdown-item
+                                    >
+                                </b-dropdown>
+                            </p>
+
+                            <b-field>
+                                <b-input
+                                    icon="magnify"
+                                    icon-clickable
+                                    placeholder="Search..."
+                                    type="search"
+                                ></b-input>
+                            </b-field>
+                        </b-field>
+                    </div>
+                </div>
+                <br />
+
+                <b-table
+                    :checked-rows.sync="checkedRows"
+                    :current-page.sync="currentPage"
+                    :data="orderList"
+                    :default-sort-direction="defaultSortDirection"
+                    :is-row-checkable="row => row.orderStatus === 'created'"
+                    :paginated="isPaginated"
+                    :pagination-position="paginationPosition"
+                    :pagination-simple="isPaginationSimple"
+                    :per-page="perPage"
+                    :sort-icon="sortIcon"
+                    :sort-icon-size="sortIconSize"
+                    checkable
+                    checkbox-position="left"
+                >
+                    <template slot-scope="props">
+                        <b-table-column
+                            field="createdAt"
+                            label="Raised on"
+                            sortable
+                        >
+                            <div class="has-text-dark is-size-6">
+                                {{ props.row.createdAt | formatDate }}
+                            </div>
+                            <div class="has-text-grey is-size-6">
+                                {{ props.row.createdAt | formatTime }}
+                            </div>
+                        </b-table-column>
+
+                        <b-table-column
+                            field="orgName"
+                            label="Organization"
+                            sortable
+                            >{{ props.row.orgName }}</b-table-column
+                        >
+
+                        <b-table-column
+                            field="requester"
+                            label="Contact Email"
+                            sortable
+                        >
+                            <div class="has-text-dark is-size-6">
+                                {{ props.row.requester }}
+                            </div>
+                        </b-table-column>
+
+                        <b-table-column
+                            field="orderType"
+                            label="Pass Type"
+                            sortable
+                        >
+                            <lozenge
+                                :type="
+                                    props.row.orderType == 'person'
+                                        ? 'primary'
+                                        : 'warning'
+                                "
+                                >{{
+                                    props.row.orderType | formatRequestLabel
+                                }}</lozenge
                             >
+                        </b-table-column>
+
+                        <b-table-column
+                            field="requestCount"
+                            label="No. of Passes"
+                            numeric
+                            sortable
+                            >{{ props.row.requestCount }}</b-table-column
+                        >
+
+                        <b-table-column field="status" label="Status" sortable>
+                            <span
+                                :class="
+                                    `has-text-${getStatusClass(
+                                        props.row.orderStatus
+                                    )}`
+                                "
+                                class="has-text-weight-bold is-uppercase"
+                                >{{
+                                    props.row.orderStatus | formatStatusLabel
+                                }}</span
+                            >
+                        </b-table-column>
+                        <b-table-column label=" " width="30">
+                            <b-dropdown
+                                :disabled="
+                                    !!props.row.orderStatus.match(
+                                        'declined|approved'
+                                    )
+                                "
+                                aria-role="list"
+                                position="is-bottom-left"
+                            >
+                                <button
+                                    class="button is-small is-white"
+                                    slot="trigger"
+                                >
+                                    <b-icon icon="dots-vertical"></b-icon>
+                                </button>
+
                                 <b-dropdown-item
-                                    @click="downloadQRCodes(props.row.id)"
+                                    @click="downloadOrderFile(props.row.id)"
                                     aria-role="listitem"
                                 >
                                     <div class="is-flex dropdown-menu-item">
                                         <b-icon
-                                            icon="download"
+                                            icon="file"
                                             type="is-primary"
                                         ></b-icon>
-                                        <span>Download Details</span>
+                                        <span>View Requests</span>
                                     </div>
                                 </b-dropdown-item>
-                            </template>
-                        </b-dropdown>
-                    </b-table-column>
-                </template>
 
-                <template slot="bottom-left">
-                    <span class="is-size-7 has-text-weight-bold m-r-8"
-                        >Request per page:</span
-                    >
-                    <b-select
-                        placeholder="Select a character"
-                        size="is-small"
-                        v-model="perPage"
-                    >
-                        <option
-                            :key="index"
-                            :value="item"
-                            v-for="(item, index) in [10, 25, 50]"
-                            >{{ item }}</option
+                                <template
+                                    v-if="props.row.orderStatus === 'created'"
+                                >
+                                    <b-dropdown-item
+                                        @click="approveRequest(props.row.id)"
+                                        aria-role="listitem"
+                                    >
+                                        <div class="is-flex dropdown-menu-item">
+                                            <b-icon
+                                                icon="check-circle-outline"
+                                                type="is-success"
+                                            ></b-icon>
+                                            <span>Approve</span>
+                                        </div>
+                                    </b-dropdown-item>
+                                    <b-dropdown-item
+                                        @click="handleDecline(props.row.id)"
+                                        aria-role="listitem"
+                                    >
+                                        <div class="is-flex dropdown-menu-item">
+                                            <b-icon
+                                                icon="close-circle-outline"
+                                                type="is-danger"
+                                            ></b-icon>
+                                            <span>Decline</span>
+                                        </div>
+                                    </b-dropdown-item>
+                                </template>
+
+                                <template
+                                    v-if="props.row.orderStatus === 'processed'"
+                                >
+                                    <b-dropdown-item
+                                        @click="downloadQRCodes(props.row.id)"
+                                        aria-role="listitem"
+                                    >
+                                        <div class="is-flex dropdown-menu-item">
+                                            <b-icon
+                                                icon="download"
+                                                type="is-primary"
+                                            ></b-icon>
+                                            <span>Download Details</span>
+                                        </div>
+                                    </b-dropdown-item>
+                                </template>
+                            </b-dropdown>
+                        </b-table-column>
+                    </template>
+
+                    <template slot="bottom-left">
+                        <span class="is-size-7 has-text-weight-bold m-r-8"
+                            >Request per page:</span
                         >
-                    </b-select>
-                </template>
-            </b-table>
+                        <b-select
+                            placeholder="Select a character"
+                            size="is-small"
+                            v-model="perPage"
+                        >
+                            <option
+                                :key="index"
+                                :value="item"
+                                v-for="(item, index) in [10, 25, 50]"
+                                >{{ item }}</option
+                            >
+                        </b-select>
+                    </template>
+                </b-table>
+            </div>
 
             <empty-table v-else></empty-table>
         </transition>
@@ -303,7 +360,7 @@ export default {
     },
     filters: {
         formatDate(date) {
-            return dayjs(new Date(date)).format('DD MMM YY');
+            return dayjs(new Date(date)).format("DD MMM' YY");
         },
         formatTime(date) {
             return dayjs(new Date(date)).format('hh:mm A');
@@ -326,7 +383,6 @@ export default {
             try {
                 const { data } = await EPassService.getAllOrders();
                 this.orderList = data.orders;
-                localStorage.setItem('orderList', JSON.stringify(data.orders));
             } catch (error) {
                 showError(`Unable to fetch requests`);
             }

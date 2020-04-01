@@ -36,8 +36,8 @@
                         </button>
 
                         <b-dropdown-item disabled>
-                            <b>Logged in as {{ userInfo.accountName }}</b>
-                            <p>{{ userInfo.email }}</p>
+                            <b>Logged in as {{ user.name }}</b>
+                            <p>{{ user.email }}</p>
                         </b-dropdown-item>
                         <hr class="dropdown-divider" />
                         <b-dropdown-item disabled>
@@ -65,13 +65,17 @@
 
 <script>
 import { clearSession } from '../utils/session';
+import EPassService from '../service/EPassService';
 export default {
     name: 'AppHeader',
     data() {
         return {
             selectedLang: 'En',
             langs: ['Hi'],
-            userInfo: JSON.parse(localStorage.getItem('userInfo'))
+            user: {
+                name: '',
+                email: ''
+            }
         };
     },
     methods: {
@@ -79,21 +83,25 @@ export default {
             clearSession();
             localStorage.clear();
             window.location.reload();
+        },
+        async fetchProfile() {
+            const { data } = await EPassService.getApproverUserProfile();
+            this.user = data;
         }
+    },
+
+    created() {
+        this.fetchProfile();
     }
 };
 </script>
 
 <style lang="scss">
-.ai-center {
-    align-items: center;
-
-    .seperator {
-        width: 2px;
-        height: 34px;
-        background-color: #ededed;
-        margin: 0 16px;
-    }
+.seperator {
+    width: 2px;
+    height: 34px;
+    background-color: #ededed;
+    margin: 0 16px;
 }
 
 .navbar {

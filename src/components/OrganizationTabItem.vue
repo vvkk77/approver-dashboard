@@ -1,99 +1,330 @@
 <template>
     <div>
-        <div class="is-flex jc-space-between">
-            <div class="is-flex">
-                <b-field>
-                    <b-radio-button native-value="pass" v-model="requestType">
-                        <span>Pass Request</span>
-                    </b-radio-button>
-                    <b-radio-button native-value="signup" v-model="requestType">
-                        <span>Sign Up Request</span>
-                    </b-radio-button>
-                </b-field>
-            </div>
+        <transition mode="out-in" name="fade">
+            <div v-if="!loading && orgList.length > 0">
+                <div class="is-flex jc-space-between ai-center">
+                    <div class="is-flex">
+                        <span class="m-r-8">Total organizations:</span>
+                        <span class="has-text-weight-bold">{{
+                            orgList.length
+                        }}</span>
+                    </div>
 
-            <div class="is-flex">
-                <transition name="fade">
-                    <b-field grouped v-if="requestType === 'pass'">
-                        <p class="control">
+                    <div class="is-flex">
+                        <b-field grouped>
+                            <p class="control">
+                                <b-dropdown
+                                    aria-role="list"
+                                    position="is-bottom-left"
+                                >
+                                    <button
+                                        class="button"
+                                        slot="trigger"
+                                        slot-scope="{ active }"
+                                    >
+                                        <span>Filter</span>
+                                        <b-icon
+                                            :icon="
+                                                active ? 'menu-up' : 'menu-down'
+                                            "
+                                        ></b-icon>
+                                    </button>
+
+                                    <b-dropdown-item aria-role="listitem"
+                                        >Action</b-dropdown-item
+                                    >
+                                    <b-dropdown-item aria-role="listitem"
+                                        >Another action</b-dropdown-item
+                                    >
+                                    <b-dropdown-item aria-role="listitem"
+                                        >Something else</b-dropdown-item
+                                    >
+                                </b-dropdown>
+                            </p>
+
+                            <b-field>
+                                <b-input
+                                    icon="magnify"
+                                    icon-clickable
+                                    placeholder="Search..."
+                                    type="search"
+                                ></b-input>
+                            </b-field>
+                        </b-field>
+                    </div>
+                </div>
+                <br />
+                <b-table
+                    :current-page.sync="currentPage"
+                    :data="orgList"
+                    :default-sort-direction="defaultSortDirection"
+                    :paginated="isPaginated"
+                    :pagination-position="paginationPosition"
+                    :pagination-simple="isPaginationSimple"
+                    :per-page="perPage"
+                    :sort-icon="sortIcon"
+                    :sort-icon-size="sortIconSize"
+                >
+                    <template slot-scope="props">
+                        <b-table-column
+                            field="createdAt"
+                            label="Raised on"
+                            sortable
+                        >
+                            <div class="has-text-dark is-size-6">
+                                {{ props.row.createdAt | formatDate }}
+                            </div>
+                            <div class="has-text-grey is-size-6">
+                                {{ props.row.createdAt | formatTime }}
+                            </div>
+                        </b-table-column>
+
+                        <b-table-column
+                            field="name"
+                            label="Organization"
+                            sortable
+                            >{{ props.row.name }}</b-table-column
+                        >
+
+                        <b-table-column
+                            field="orgID"
+                            label="Organization ID"
+                            sortable
+                        >
+                            <div class="has-text-dark is-size-6">
+                                {{ props.row.orgID }}
+                            </div>
+                        </b-table-column>
+
+                        <b-table-column
+                            field="activePassLimit"
+                            label="Overall Limit"
+                            sortable
+                        >
+                            <div class="has-text-dark is-size-6">
+                                {{ props.row.activePassLimit | formatNumber }}
+                            </div>
+                        </b-table-column>
+
+                        <b-table-column
+                            field="activePassCount"
+                            label="Active passes"
+                            sortable
+                            >{{
+                                props.row.activePassCount | formatNumber
+                            }}</b-table-column
+                        >
+
+                        <b-table-column field="status" label="Status" sortable>
+                            <span
+                                :class="
+                                    `has-text-${
+                                        props.row.status == 'VERIFIED'
+                                            ? 'success'
+                                            : 'warning'
+                                    }`
+                                "
+                                class="has-text-weight-bold is-uppercase"
+                                >{{ props.row.status }}</span
+                            >
+                        </b-table-column>
+                        <b-table-column label=" " width="30">
                             <b-dropdown
                                 aria-role="list"
                                 position="is-bottom-left"
                             >
                                 <button
-                                    class="button"
+                                    class="button is-small is-white"
                                     slot="trigger"
-                                    slot-scope="{ active }"
                                 >
-                                    <span>Filter</span>
-                                    <b-icon
-                                        :icon="active ? 'menu-up' : 'menu-down'"
-                                    ></b-icon>
+                                    <b-icon icon="dots-vertical"></b-icon>
                                 </button>
 
-                                <b-dropdown-item aria-role="listitem" value
-                                    >Action</b-dropdown-item
+                                <b-dropdown-item
+                                    @click="orgEditLimit = props.row.orgID"
+                                    aria-role="listitem"
                                 >
-                                <b-dropdown-item aria-role="listitem" value
-                                    >Another action</b-dropdown-item
-                                >
-                                <b-dropdown-item aria-role="listitem" value
-                                    >Something else</b-dropdown-item
-                                >
+                                    <div class="is-flex dropdown-menu-item">
+                                        <b-icon
+                                            icon="border-color"
+                                            type="is-primary"
+                                        ></b-icon>
+                                        <span>Edit overall limit</span>
+                                    </div>
+                                </b-dropdown-item>
                             </b-dropdown>
-                        </p>
+                        </b-table-column>
+                    </template>
+                    <template slot="bottom-left">
+                        <span class="is-size-7 has-text-weight-bold m-r-8"
+                            >Request per page:</span
+                        >
+                        <b-select
+                            placeholder="Select a character"
+                            size="is-small"
+                            v-model="perPage"
+                        >
+                            <option
+                                :key="index"
+                                :value="item"
+                                v-for="(item, index) in [10, 25, 50]"
+                                >{{ item }}</option
+                            >
+                        </b-select>
+                    </template>
+                </b-table>
+            </div>
+            <empty-table v-else></empty-table>
+        </transition>
 
+        <b-modal
+            :active="!!orgEditLimit"
+            :can-cancel="false"
+            aria-role="dialog"
+            aria-modal
+            has-modal-card
+            trap-focus
+        >
+            <form class="modal-card" style="width: 360px">
+                <form class="modal-card-body is-rounded">
+                    <p class="title is-4">Edit Overall Passes Limit</p>
+                    <form @submit.prevent.stop>
                         <b-field>
                             <b-input
-                                icon="magnify"
-                                icon-clickable
-                                placeholder="Search..."
-                                type="search"
+                                expanded
+                                placeholder
+                                size="is-medium"
+                                type="number"
+                                v-model="newLimit"
                             ></b-input>
+                            <p class="control">
+                                <span class="button is-static is-medium"
+                                    >Passes</span
+                                >
+                            </p>
                         </b-field>
-                    </b-field>
-                </transition>
-            </div>
-        </div>
-
-        <br />
-
-        <transition mode="out-in" name="fade">
-            <pass-request-table
-                v-if="requestType === 'pass'"
-            ></pass-request-table>
-            <sign-up-request-table v-else></sign-up-request-table>
-        </transition>
+                        <div class="buttons stretch">
+                            <b-button
+                                :disabled="loading"
+                                @click="orgEditLimit = null"
+                                outlined
+                                size="is-medium"
+                                type="is-primary"
+                                >Cancel</b-button
+                            >
+                            <b-button
+                                :disabled="loading"
+                                :loading="loading"
+                                @click="submitLimit"
+                                native-type="submit"
+                                size="is-medium"
+                                type="is-primary"
+                                >Set limit</b-button
+                            >
+                        </div>
+                    </form>
+                </form>
+            </form>
+        </b-modal>
     </div>
 </template>
 
 <script>
-import PassRequestTable from './PassRequestTable.vue';
-import SignUpRequestTable from './SignUpRequestTable.vue';
+import dayjs from 'dayjs';
+import EPassService from '../service/EPassService';
+import { showError } from '../utils/toast';
+import EmptyTable from './EmptyTable.vue';
 
 export default {
     name: 'OrganizationTabItem',
-    components: {
-        PassRequestTable,
-        SignUpRequestTable
-    },
+    components: { EmptyTable },
     data() {
+        let orgList = localStorage.getItem('orgList');
+        if (orgList) {
+            orgList = JSON.parse(orgList);
+        }
+
         return {
-            signUpList: [],
-            requestType: 'pass'
+            orgList: orgList || [],
+            loading: false,
+            orgEditLimit: null,
+            newLimit: null,
+
+            isPaginated: true,
+            isPaginationSimple: false,
+            paginationPosition: 'bottom',
+            defaultSortDirection: 'asc',
+            sortIcon: 'arrow-up',
+            sortIconSize: 'is-small',
+            currentPage: 1,
+            perPage: 10
         };
     },
 
-    mounted() {}
+    watch: {
+        orgEditLimit(value) {
+            if (value) {
+                const org = this.orgList.find(o => o.orgID === value);
+
+                org && (this.newLimit = org.activePassLimit);
+            }
+        }
+    },
+
+    filters: {
+        formatDate(date) {
+            return dayjs(new Date(date)).format("DD MMM' YY");
+        },
+        formatTime(date) {
+            return dayjs(new Date(date)).format('hh:mm A');
+        },
+        formatNumber(number) {
+            return new Intl.NumberFormat('en-IN').format(number);
+        }
+    },
+
+    methods: {
+        async fetchAllOrganizations() {
+            this.loading = true;
+            try {
+                const { data } = await EPassService.getAllOrganizations();
+                this.orgList = data.organizations;
+            } catch (error) {
+                showError(`Unable to fetch organizations`);
+            }
+            this.loading = false;
+        },
+
+        async submitLimit() {
+            const orgID = String(this.orgEditLimit);
+
+            this.loading = true;
+
+            try {
+                await EPassService.setPassLimit(this.newLimit, orgID);
+                this.fetchAllOrganizations();
+            } catch (error) {
+                showError(`Unable to set new limit`);
+            }
+
+            this.newLimit = null;
+            this.orgEditLimit = null;
+            this.loading = false;
+        }
+    },
+    created() {
+        this.fetchAllOrganizations();
+    }
 };
 </script>
 
 <style lang="scss">
-.jc-space-between {
-    justify-content: space-between;
-}
-
-.jc-space-around {
-    justify-content: space-around;
+.stretch {
+    margin-top: 2rem;
+    justify-content: center;
+    button {
+        flex: 1;
+        font-weight: 600;
+    }
 }
 </style>
