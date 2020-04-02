@@ -58,6 +58,10 @@ const routes = [
                 next();
             } else next('/login');
         }
+    },
+    {
+        path: '*',
+        redirect: '/'
     }
 ];
 
