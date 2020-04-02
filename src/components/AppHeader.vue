@@ -40,12 +40,7 @@
                             <p>{{ user.email }}</p>
                         </b-dropdown-item>
                         <hr class="dropdown-divider" />
-                        <b-dropdown-item disabled>
-                            <div class="is-flex dropdown-menu-item">
-                                <b-icon icon="account"></b-icon>
-                                <span>Staff Members</span>
-                            </div>
-                        </b-dropdown-item>
+
                         <b-dropdown-item
                             @click="logout"
                             aria-role="menuitem"

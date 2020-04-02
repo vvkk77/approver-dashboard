@@ -103,42 +103,18 @@
 
             <empty-table v-else></empty-table>
         </transition>
-
-        <transition name="slideInBottom">
-            <sign-up-table-action-sheet
-                @approve="approveAll"
-                v-if="checkedRows.length > 0"
-            ></sign-up-table-action-sheet>
-        </transition>
-
-        <b-modal :active="showProgess" has-modal-card>
-            <div class="modal-card">
-                <div class="modal-card-body is-rounded">
-                    <p class="title is-4">Submitting Requests</p>
-                    <b-progress
-                        :value="reqProgess"
-                        show-value
-                        type="is-success"
-                    >
-                        {{ reqIndex }} out of
-                        {{ checkedRows.length }}
-                    </b-progress>
-                </div>
-            </div>
-        </b-modal>
     </div>
 </template>
 
 <script>
 import EPassService from '../service/EPassService';
-import SignUpTableActionSheet from './SignUpTableActionSheet.vue';
 import { showError, showSuccess } from '../utils/toast';
 import EmptyTable from './EmptyTable.vue';
 
 export default {
     name: 'PassRequestTable',
 
-    components: { SignUpTableActionSheet, EmptyTable },
+    components: { EmptyTable },
 
     data() {
         let signUpList = localStorage.getItem('signUpList');
@@ -159,17 +135,11 @@ export default {
             sortIcon: 'arrow-up',
             sortIconSize: 'is-small',
             currentPage: 1,
-            perPage: 10,
-            reqIndex: 1,
-            showProgess: false
+            perPage: 10
         };
     },
 
-    computed: {
-        reqProgess() {
-            return Math.ceil((this.reqIndex / this.checkedRows.length) * 100);
-        }
-    },
+    computed: {},
 
     methods: {
         async fetchSignUpRequests() {
@@ -189,30 +159,6 @@ export default {
                 showSuccess(`Request Approved!`);
             } catch (error) {
                 showError(`Unable to approve request`);
-            }
-        },
-
-        async approveAll() {
-            try {
-                this.showProgess = true;
-                const emailList = this.checkedRows.map(i => i.email);
-
-                for (let index = 0; index < emailList.length; index++) {
-                    this.reqIndex = index + 1;
-                    const email = emailList[index];
-                    await EPassService.approveAccount(email);
-                }
-
-                await this.fetchSignUpRequests();
-
-                this.checkedRows = [];
-                this.showProgess = false;
-
-                showSuccess(`All Request Approved!`);
-            } catch (error) {
-                this.showProgess = false;
-                this.checkedRows = [];
-                showError(`Unable to approve requests`);
             }
         }
     },

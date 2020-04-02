@@ -6,9 +6,9 @@
                     <div class="is-flex">
                         <div class="is-flex">
                             <span class="m-r-8">Total pass requests:</span>
-                            <span class="has-text-weight-bold">{{
-                                filteredOrderList.length
-                            }}</span>
+                            <span class="has-text-weight-bold">
+                                {{ filteredOrderList.length }}
+                            </span>
                         </div>
                     </div>
                     <div class="is-flex">
@@ -75,7 +75,6 @@
                 <br />
 
                 <b-table
-                    :checked-rows.sync="checkedRows"
                     :current-page.sync="currentPage"
                     :data="filteredOrderList"
                     :default-sort-direction="defaultSortDirection"
@@ -85,7 +84,6 @@
                     :per-page="perPage"
                     :sort-icon="sortIcon"
                     :sort-icon-size="sortIconSize"
-                    checkbox-position="left"
                 >
                     <template slot-scope="props">
                         <b-table-column
@@ -129,10 +127,9 @@
                                         ? 'primary'
                                         : 'warning'
                                 "
-                                >{{
-                                    props.row.orderType | formatRequestLabel
-                                }}</lozenge
                             >
+                                {{ props.row.orderType | formatRequestLabel }}
+                            </lozenge>
                         </b-table-column>
 
                         <b-table-column
@@ -156,10 +153,9 @@
                                     )}`
                                 "
                                 class="has-text-weight-bold is-uppercase"
-                                >{{
-                                    props.row.orderStatus | formatStatusLabel
-                                }}</span
                             >
+                                {{ props.row.orderStatus | formatStatusLabel }}
+                            </span>
                         </b-table-column>
                         <b-table-column label=" " width="30">
                             <b-dropdown
@@ -263,14 +259,6 @@
             <empty-table v-else></empty-table>
         </transition>
 
-        <transition name="slideInBottom">
-            <pass-table-action-sheet
-                @approve="approveAll"
-                @decline="handleDeclineAll"
-                v-if="checkedRows.length > 0"
-            ></pass-table-action-sheet>
-        </transition>
-
         <b-modal :active.sync="showDeclineModal" has-modal-card>
             <div class="modal-card decline-modal" style="width:480px">
                 <div class="modal-card-body is-rounded">
@@ -291,9 +279,7 @@
                     <div class="is-flex jc-flex-end">
                         <div class="buttons">
                             <b-button
-                                @click="
-                                    declineMultiple = showDeclineModal = false
-                                "
+                                @click="showDeclineModal = false"
                                 outlined
                                 type="is-primary"
                                 >Cancel</b-button
@@ -301,32 +287,12 @@
 
                             <b-button
                                 :disabled="!declineReason"
+                                @click="submitReason"
                                 type="is-primary"
-                                v-on="{
-                                    click: declineMultiple
-                                        ? submitReasonForMultiple
-                                        : submitReason
-                                }"
                                 >Submit</b-button
                             >
                         </div>
                     </div>
-                </div>
-            </div>
-        </b-modal>
-
-        <b-modal :active="showProgess" has-modal-card>
-            <div class="modal-card">
-                <div class="modal-card-body is-rounded">
-                    <p class="title is-4">Submitting Requests</p>
-                    <b-progress
-                        :value="reqProgess"
-                        show-value
-                        type="is-success"
-                    >
-                        {{ reqIndex }} out of
-                        {{ checkedRows.length }}
-                    </b-progress>
                 </div>
             </div>
         </b-modal>
@@ -336,7 +302,6 @@
 <script>
 import EPassService from '../service/EPassService';
 import Lozenge from './Lozenge.vue';
-import PassTableActionSheet from './PassTableActionSheet.vue';
 import dayjs from 'dayjs';
 import { showSuccess, showError } from '../utils/toast';
 import EmptyTable from './EmptyTable.vue';
@@ -344,7 +309,7 @@ import EmptyTable from './EmptyTable.vue';
 export default {
     name: 'PassRequestTable',
 
-    components: { PassTableActionSheet, Lozenge, EmptyTable },
+    components: { Lozenge, EmptyTable },
 
     data() {
         let orderList = localStorage.getItem('orderList');
@@ -357,12 +322,10 @@ export default {
             statusOption: 'all',
             searchText: '',
             orderList: orderList || [],
-            checkedRows: [],
             showDeclineModal: false,
 
             declineReason: '',
             declineOrderId: null,
-            declineMultiple: false,
             isPaginated: true,
             isPaginationSimple: false,
             paginationPosition: 'bottom',
@@ -370,17 +333,11 @@ export default {
             sortIcon: 'arrow-up',
             sortIconSize: 'is-small',
             currentPage: 1,
-            perPage: 10,
-            reqIndex: 1,
-            showProgess: false
+            perPage: 10
         };
     },
 
     computed: {
-        reqProgess() {
-            return Math.ceil((this.reqIndex / this.checkedRows.length) * 100);
-        },
-
         statusMap() {
             const map = {
                 all: 'Show All'
@@ -464,49 +421,6 @@ export default {
             }
         },
 
-        async approveAll() {
-            try {
-                this.showProgess = true;
-                const orderIdList = this.checkedRows.map(i => i.id);
-
-                for (let index = 0; index < orderIdList.length; index++) {
-                    this.reqIndex = index + 1;
-                    const orderId = orderIdList[index];
-                    await EPassService.approveOrder(orderId, 'ACCEPT');
-                }
-
-                await this.fetchAllOrders();
-
-                this.checkedRows = [];
-                this.showProgess = false;
-
-                showSuccess(`All Request Approved!`);
-            } catch (error) {
-                showError(`Unable to approve requests`);
-            }
-        },
-        async declineAll() {
-            try {
-                this.showProgess = true;
-
-                const orderIdList = this.checkedRows.map(i => i.id);
-
-                for (let index = 0; index < orderIdList.length; index++) {
-                    this.reqIndex = index + 1;
-                    const orderId = orderIdList[index];
-                    await EPassService.approveOrder(orderId, 'DECLINE');
-                }
-
-                await this.fetchAllOrders();
-
-                this.checkedRows = [];
-                this.showProgess = false;
-                showSuccess(`All Request Rejected!`);
-            } catch (error) {
-                showError(`Unable to reject requests`);
-            }
-        },
-
         async downloadQRCodes(orderId) {
             try {
                 const { data } = await EPassService.downloadQRCodes(orderId);
@@ -541,22 +455,9 @@ export default {
             }
         },
 
-        handleDeclineAll() {
-            this.showDeclineModal = true;
-            this.declineReason = '';
-            this.declineMultiple = true;
-        },
-
         submitReason() {
-            this.declineMultiple = false;
             this.showDeclineModal = false;
             this.declineRequest(this.declineOrderId);
-        },
-
-        submitReasonForMultiple() {
-            this.declineMultiple = false;
-            this.showDeclineModal = false;
-            this.declineAll();
         },
 
         handleDecline(orderId) {
