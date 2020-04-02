@@ -2,58 +2,65 @@
     <div>
         <app-header></app-header>
         <div class="app-body">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item org-details">
-                        <div
-                            class="has-text-black is-size-5 has-text-weight-semibold"
-                        >
-                            {{ orderList.length | formatNumber }} Requests
-                        </div>
-                        <div class="seperator"></div>
-                        <div
-                            class="is-block has-text-black has-text-weight-semibold"
-                        >
-                            <div class="is-size-6">
-                                {{ org.activePassLimit | formatNumber }} passes
+            <div class="container">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item org-details">
+                            <div
+                                class="has-text-black is-size-5 has-text-weight-semibold"
+                            >
+                                {{ orderList.length | formatNumber }} Requests
                             </div>
-
-                            <div class="is-size-7 has-text-weight-normal">
-                                Overall limit
-                            </div>
-                        </div>
-                        <template v-if="org.activePassCount">
                             <div class="seperator"></div>
-                            <div class="is-block has-text-black">
-                                <div class="is-size-6 has-text-success">
-                                    {{
-                                        (org.activePassLimit -
-                                            org.activePassCount)
-                                            | formatNumber
-                                    }}
+                            <div
+                                class="is-block has-text-black has-text-weight-semibold"
+                            >
+                                <div class="is-size-6">
+                                    {{ org.activePassLimit | formatNumber }}
                                     passes
                                 </div>
 
                                 <div class="is-size-7 has-text-weight-normal">
-                                    Available
+                                    Overall limit
                                 </div>
                             </div>
-                        </template>
-                    </div>
-                </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <b-button @click="openCreateRequest" type="is-primary"
-                            >Create Request</b-button
-                        >
-                    </div>
-                </div>
-            </div>
+                            <template v-if="org.activePassCount">
+                                <div class="seperator"></div>
+                                <div class="is-block has-text-black">
+                                    <div class="is-size-6 has-text-success">
+                                        {{
+                                            (org.activePassLimit -
+                                                org.activePassCount)
+                                                | formatNumber
+                                        }}
+                                        passes
+                                    </div>
 
-            <div class="no-request-image" v-if="orderList.length === 0">
-                <img alt src="../assets/no-request.png" />
+                                    <div
+                                        class="is-size-7 has-text-weight-normal"
+                                    >
+                                        Available
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <b-button
+                                @click="openCreateRequest"
+                                type="is-primary"
+                                >Create Request</b-button
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-request-image" v-if="orderList.length === 0">
+                    <img alt src="../assets/no-request.png" />
+                </div>
+                <orders-table :data.sync="orderList" v-else></orders-table>
             </div>
-            <orders-table :data.sync="orderList" v-else></orders-table>
         </div>
         <create-request
             @close="openCR = false"
