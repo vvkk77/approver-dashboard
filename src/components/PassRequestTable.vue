@@ -6,9 +6,9 @@
                     <div class="is-flex">
                         <div class="is-flex">
                             <span class="m-r-8">Total pass requests:</span>
-                            <span class="has-text-weight-bold">
-                                {{ orderList.length }}
-                            </span>
+                            <span class="has-text-weight-bold">{{
+                                filteredOrderList.length
+                            }}</span>
                         </div>
                     </div>
                     <div class="is-flex">
@@ -16,14 +16,24 @@
                             <p class="control">
                                 <b-dropdown
                                     aria-role="list"
+                                    class="filter-options"
                                     position="is-bottom-left"
+                                    v-model="statusOption"
                                 >
                                     <button
                                         class="button"
                                         slot="trigger"
                                         slot-scope="{ active }"
                                     >
-                                        <span>Filter</span>
+                                        <span
+                                            :class="
+                                                `has-text-${getStatusClass(
+                                                    statusOption
+                                                )}`
+                                            "
+                                            class="has-text-weight-semibold is-uppercase"
+                                            >{{ statusMap[statusOption] }}</span
+                                        >
                                         <b-icon
                                             :icon="
                                                 active ? 'menu-up' : 'menu-down'
@@ -31,15 +41,22 @@
                                         ></b-icon>
                                     </button>
 
-                                    <b-dropdown-item aria-role="listitem" value
-                                        >Action</b-dropdown-item
+                                    <b-dropdown-item
+                                        :key="value"
+                                        :value="value"
+                                        aria-role="listitem"
+                                        v-for="(status, value) in statusMap"
                                     >
-                                    <b-dropdown-item aria-role="listitem" value
-                                        >Another action</b-dropdown-item
-                                    >
-                                    <b-dropdown-item aria-role="listitem" value
-                                        >Something else</b-dropdown-item
-                                    >
+                                        <span
+                                            :class="
+                                                `has-text-${getStatusClass(
+                                                    value
+                                                )}`
+                                            "
+                                            class="has-text-weight-bold is-uppercase"
+                                            >{{ status }}</span
+                                        >
+                                    </b-dropdown-item>
                                 </b-dropdown>
                             </p>
 
@@ -49,6 +66,7 @@
                                     icon-clickable
                                     placeholder="Search..."
                                     type="search"
+                                    v-model="searchText"
                                 ></b-input>
                             </b-field>
                         </b-field>
@@ -59,16 +77,14 @@
                 <b-table
                     :checked-rows.sync="checkedRows"
                     :current-page.sync="currentPage"
-                    :data="orderList"
+                    :data="filteredOrderList"
                     :default-sort-direction="defaultSortDirection"
-                    :is-row-checkable="row => row.orderStatus === 'created'"
                     :paginated="isPaginated"
                     :pagination-position="paginationPosition"
                     :pagination-simple="isPaginationSimple"
                     :per-page="perPage"
                     :sort-icon="sortIcon"
                     :sort-icon-size="sortIconSize"
-                    checkable
                     checkbox-position="left"
                 >
                     <template slot-scope="props">
@@ -113,9 +129,10 @@
                                         ? 'primary'
                                         : 'warning'
                                 "
+                                >{{
+                                    props.row.orderType | formatRequestLabel
+                                }}</lozenge
                             >
-                                {{ props.row.orderType | formatRequestLabel }}
-                            </lozenge>
                         </b-table-column>
 
                         <b-table-column
@@ -126,7 +143,12 @@
                             >{{ props.row.requestCount }}</b-table-column
                         >
 
-                        <b-table-column field="status" label="Status" sortable>
+                        <b-table-column
+                            field="status"
+                            label="Status"
+                            sortable
+                            width="120"
+                        >
                             <span
                                 :class="
                                     `has-text-${getStatusClass(
@@ -134,9 +156,10 @@
                                     )}`
                                 "
                                 class="has-text-weight-bold is-uppercase"
+                                >{{
+                                    props.row.orderStatus | formatStatusLabel
+                                }}</span
                             >
-                                {{ props.row.orderStatus | formatStatusLabel }}
-                            </span>
                         </b-table-column>
                         <b-table-column label=" " width="30">
                             <b-dropdown
@@ -164,7 +187,7 @@
                                             icon="file"
                                             type="is-primary"
                                         ></b-icon>
-                                        <span>View Requests</span>
+                                        <span>Download Request File</span>
                                     </div>
                                 </b-dropdown-item>
 
@@ -209,7 +232,7 @@
                                                 icon="download"
                                                 type="is-primary"
                                             ></b-icon>
-                                            <span>Download Details</span>
+                                            <span>Download Passes</span>
                                         </div>
                                     </b-dropdown-item>
                                 </template>
@@ -331,6 +354,8 @@ export default {
         }
 
         return {
+            statusOption: 'all',
+            searchText: '',
             orderList: orderList || [],
             checkedRows: [],
             showDeclineModal: false,
@@ -354,6 +379,36 @@ export default {
     computed: {
         reqProgess() {
             return Math.ceil((this.reqIndex / this.checkedRows.length) * 100);
+        },
+
+        statusMap() {
+            const map = {
+                all: 'Show All'
+            };
+
+            this.orderList.forEach(o => {
+                map[o.orderStatus] = this.$options.filters.formatStatusLabel(
+                    o.orderStatus
+                );
+            });
+
+            return map;
+        },
+
+        filterByStatus() {
+            if (this.statusOption === 'all') {
+                return this.orderList;
+            }
+
+            return this.orderList.filter(o =>
+                o.orderStatus.match(this.statusOption)
+            );
+        },
+
+        filteredOrderList() {
+            return this.filterByStatus.filter(o =>
+                o.searchTerm.match(this.searchText.trim().toLowerCase())
+            );
         }
     },
     filters: {
@@ -511,16 +566,13 @@ export default {
         },
 
         getStatusClass(status) {
-            switch (status) {
-                case 'created':
-                    return 'warning';
+            if (status.match('all')) return 'dark';
 
-                case 'declined':
-                    return 'danger';
+            if (status.match('created|processing')) return 'warning';
 
-                case 'approved':
-                    return 'success';
-            }
+            if (status.match('declined|failed|invalid_file')) return 'danger';
+
+            if (status.match('approved')) return 'success';
 
             return 'primary';
         }
@@ -545,5 +597,13 @@ export default {
 }
 .jc-flex-end {
     justify-content: flex-end;
+}
+
+.filter-options {
+    .dropdown-item.is-active,
+    .dropdown .dropdown-menu .has-link .is-active,
+    .dropdown-item.is-active {
+        background-color: #f7f7f7;
+    }
 }
 </style>

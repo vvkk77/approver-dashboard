@@ -77,6 +77,17 @@ export default {
                 authToken: getAuthToken()
             })
             .then(req => {
+                req.data.orders.forEach(e => {
+                    e.searchTerm = [
+                        e.orgName,
+                        e.requester,
+                        e.orderStatus,
+                        e.reason
+                    ]
+                        .join('|')
+                        .toLowerCase();
+                });
+
                 localStorage.setItem(
                     'orderList',
                     JSON.stringify(req.data.orders)
@@ -134,6 +145,17 @@ export default {
                 authToken: getAuthToken()
             })
             .then(req => {
+                req.data.organizations.forEach(e => {
+                    e.searchTerm = [
+                        e.name,
+                        e.orgID,
+                        e.status,
+                        e.activePassLimit
+                    ]
+                        .join('|')
+                        .toLowerCase();
+                });
+
                 localStorage.setItem(
                     'orgList',
                     JSON.stringify(req.data.organizations)

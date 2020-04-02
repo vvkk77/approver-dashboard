@@ -6,27 +6,23 @@
                 :current-page.sync="currentPage"
                 :data="signUpList"
                 :default-sort-direction="defaultSortDirection"
-                :is-row-checkable="row => true"
                 :paginated="isPaginated"
                 :pagination-position="paginationPosition"
                 :pagination-simple="isPaginationSimple"
                 :per-page="perPage"
                 :sort-icon="sortIcon"
                 :sort-icon-size="sortIconSize"
-                checkable
                 checkbox-position="left"
                 v-if="!loading && signUpList.length"
             >
                 <template slot-scope="props">
-                    <b-table-column field="name" label="Name" sortable>
+                    <b-table-column
+                        field="orgName"
+                        label="Organization Name"
+                        sortable
+                    >
                         <div class="has-text-dark is-size-6">
-                            {{ props.row.name }}
-                        </div>
-                    </b-table-column>
-
-                    <b-table-column field="email" label="Email" sortable>
-                        <div class="has-text-dark is-size-6">
-                            {{ props.row.email }}
+                            {{ props.row.orgName }}
                         </div>
                     </b-table-column>
 
@@ -40,13 +36,15 @@
                         </div>
                     </b-table-column>
 
-                    <b-table-column
-                        field="orgName"
-                        label="Organization Name"
-                        sortable
-                    >
+                    <b-table-column field="name" label="SPOC Name" sortable>
                         <div class="has-text-dark is-size-6">
-                            {{ props.row.orgName }}
+                            {{ props.row.name }}
+                        </div>
+                    </b-table-column>
+
+                    <b-table-column field="email" label="SPOC Email" sortable>
+                        <div class="has-text-dark is-size-6">
+                            {{ props.row.email }}
                         </div>
                     </b-table-column>
 

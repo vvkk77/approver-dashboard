@@ -5,9 +5,9 @@
                 <div class="is-flex jc-space-between ai-center">
                     <div class="is-flex">
                         <span class="m-r-8">Total organizations:</span>
-                        <span class="has-text-weight-bold">{{
-                            orgList.length
-                        }}</span>
+                        <span class="has-text-weight-bold">
+                            {{ filteredOrgList.length }}
+                        </span>
                     </div>
 
                     <div class="is-flex">
@@ -15,14 +15,24 @@
                             <p class="control">
                                 <b-dropdown
                                     aria-role="list"
+                                    class="filter-options"
                                     position="is-bottom-left"
+                                    v-model="statusOption"
                                 >
                                     <button
                                         class="button"
                                         slot="trigger"
                                         slot-scope="{ active }"
                                     >
-                                        <span>Filter</span>
+                                        <span
+                                            :class="
+                                                `has-text-${getStatusClass(
+                                                    statusOption
+                                                )}`
+                                            "
+                                            class="has-text-weight-semibold is-uppercase"
+                                            >{{ statusMap[statusOption] }}</span
+                                        >
                                         <b-icon
                                             :icon="
                                                 active ? 'menu-up' : 'menu-down'
@@ -30,15 +40,22 @@
                                         ></b-icon>
                                     </button>
 
-                                    <b-dropdown-item aria-role="listitem"
-                                        >Action</b-dropdown-item
+                                    <b-dropdown-item
+                                        :key="value"
+                                        :value="value"
+                                        aria-role="listitem"
+                                        v-for="(status, value) in statusMap"
                                     >
-                                    <b-dropdown-item aria-role="listitem"
-                                        >Another action</b-dropdown-item
-                                    >
-                                    <b-dropdown-item aria-role="listitem"
-                                        >Something else</b-dropdown-item
-                                    >
+                                        <span
+                                            :class="
+                                                `has-text-${getStatusClass(
+                                                    value
+                                                )}`
+                                            "
+                                            class="has-text-weight-bold is-uppercase"
+                                            >{{ status }}</span
+                                        >
+                                    </b-dropdown-item>
                                 </b-dropdown>
                             </p>
 
@@ -48,6 +65,7 @@
                                     icon-clickable
                                     placeholder="Search..."
                                     type="search"
+                                    v-model="searchText"
                                 ></b-input>
                             </b-field>
                         </b-field>
@@ -56,7 +74,7 @@
                 <br />
                 <b-table
                     :current-page.sync="currentPage"
-                    :data="orgList"
+                    :data="filteredOrgList"
                     :default-sort-direction="defaultSortDirection"
                     :paginated="isPaginated"
                     :pagination-position="paginationPosition"
@@ -110,10 +128,9 @@
                             field="activePassCount"
                             label="Active passes"
                             sortable
-                            >{{
-                                props.row.activePassCount | formatNumber
-                            }}</b-table-column
                         >
+                            {{ props.row.activePassCount | formatNumber }}
+                        </b-table-column>
 
                         <b-table-column field="status" label="Status" sortable>
                             <span
@@ -245,6 +262,8 @@ export default {
         }
 
         return {
+            statusOption: 'all',
+            searchText: '',
             orgList: orgList || [],
             loading: false,
             orgEditLimit: null,
@@ -268,6 +287,37 @@ export default {
 
                 org && (this.newLimit = org.activePassLimit);
             }
+        },
+        filteredOrgList() {
+            this.$emit('orgCount');
+        }
+    },
+
+    computed: {
+        statusMap() {
+            const map = {
+                all: 'Show All'
+            };
+
+            this.orgList.forEach(o => {
+                map[o.status] = o.status;
+            });
+
+            return map;
+        },
+
+        filterByStatus() {
+            if (this.statusOption === 'all') {
+                return this.orgList;
+            }
+
+            return this.orgList.filter(o => o.status.match(this.statusOption));
+        },
+
+        filteredOrgList() {
+            return this.filterByStatus.filter(o =>
+                o.searchTerm.match(this.searchText.trim().toLowerCase())
+            );
         }
     },
 
@@ -310,6 +360,15 @@ export default {
             this.newLimit = null;
             this.orgEditLimit = null;
             this.loading = false;
+        },
+        getStatusClass(status) {
+            if (status.match('all')) return 'dark';
+
+            if (status.match('UNVERIFIED')) return 'warning';
+
+            if (status.match('VERIFIED')) return 'success';
+
+            return 'primary';
         }
     },
     created() {
