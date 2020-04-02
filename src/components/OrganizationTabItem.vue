@@ -5,9 +5,9 @@
                 <div class="is-flex jc-space-between ai-center">
                     <div class="is-flex">
                         <span class="m-r-8">Total organizations:</span>
-                        <span class="has-text-weight-bold">
-                            {{ filteredOrgList.length }}
-                        </span>
+                        <span class="has-text-weight-bold">{{
+                            filteredOrgList.length
+                        }}</span>
                     </div>
 
                     <div class="is-flex">
@@ -128,9 +128,10 @@
                             field="activePassCount"
                             label="Active passes"
                             sortable
+                            >{{
+                                props.row.activePassCount | formatNumber
+                            }}</b-table-column
                         >
-                            {{ props.row.activePassCount | formatNumber }}
-                        </b-table-column>
 
                         <b-table-column field="status" label="Status" sortable>
                             <span
@@ -310,8 +311,7 @@ export default {
             if (this.statusOption === 'all') {
                 return this.orgList;
             }
-
-            return this.orgList.filter(o => o.status.match(this.statusOption));
+            return this.orgList.filter(o => o.status == this.statusOption);
         },
 
         filteredOrgList() {
