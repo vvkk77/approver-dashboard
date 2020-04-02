@@ -14,7 +14,7 @@ export const getError = error => {
 
     const expection = message.split(':');
 
-    if (expection) {
+    if (expection.length === 2) {
         return expection[1];
     }
 

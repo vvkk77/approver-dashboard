@@ -2,11 +2,13 @@
     <div>
         <b-table
             :current-page.sync="currentPage"
-            :data="data"
+            :data="orderList"
+            :default-sort-direction="defaultSortDirection"
             :paginated="isPaginated"
             :pagination-position="paginationPosition"
-            :pagination-simple="false"
             :per-page="perPage"
+            :sort-icon="sortIcon"
+            :sort-icon-size="sortIconSize"
         >
             <template slot-scope="props">
                 <b-table-column field="createAt" label="Raised on" sortable>
@@ -32,10 +34,13 @@
                 <b-table-column
                     field="passCount"
                     label="No. of Passes"
-                    numeric
                     sortable
                     >{{ props.row.requestCount }}</b-table-column
                 >
+
+                <b-table-column field="passCount" label="Purpose" sortable>{{
+                    props.row.purpose
+                }}</b-table-column>
 
                 <b-table-column field="status" label="Status" sortable>
                     <span
@@ -46,7 +51,7 @@
                         >{{ props.row.orderStatus | formatStatusLabel }}</span
                     >
                 </b-table-column>
-                <b-table-column label=" ">
+                <b-table-column field="zipFileURL" label=" ">
                     <b-button
                         @click="downloadQRCodes(props.row.id)"
                         class="has-text-primary has-text-weight-semibold"
@@ -98,8 +103,12 @@ export default {
     },
     data() {
         return {
+            orderList: this.data,
             isPaginated: true,
             paginationPosition: 'bottom',
+            defaultSortDirection: 'asc',
+            sortIcon: 'arrow-up',
+            sortIconSize: 'is-small',
             currentPage: 1,
             perPage: 10
         };
@@ -119,6 +128,8 @@ export default {
         },
 
         formatStatusLabel(status) {
+            status = status.replace('_', ' ');
+
             if (status.toLowerCase() === 'created') return 'PENDING';
             if (status.toLowerCase() === 'declined') return 'REJECTED';
 

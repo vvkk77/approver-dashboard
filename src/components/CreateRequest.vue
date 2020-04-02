@@ -1,164 +1,131 @@
 <template>
     <side-sheet @close="$emit('close')">
         <div class="create-request-container">
-            <template v-if="!requestCreated">
-                <div class="title is-4">Create Request</div>
+            <transition mode="out-in" name="fade">
+                <div v-if="!requestCreated">
+                    <div class="title is-4">Create Request</div>
+                    <br />
 
-                <b-steps
-                    :animated="true"
-                    :has-navigation="false"
-                    v-model="activeStep"
-                >
-                    <b-step-item icon="numeric-1">
-                        <div class="title is-6">Choose an eligble service</div>
-                        <div class="subtitle is-7">
-                            Only staff engaged in services from this list are
-                            entitled to receive passes!
+                    <transition mode="out-in" name="fade">
+                        <div v-if="!selectedReason">
+                            <div class="title is-6">
+                                Choose an eligble service
+                            </div>
+                            <div class="subtitle is-7">
+                                Only staff engaged in services from this list
+                                are entitled to receive passes!
+                            </div>
+
+                            <ul class="reason-list-container">
+                                <li
+                                    :key="i"
+                                    @click="setReason(reason)"
+                                    v-for="(reason, i) in reasonList"
+                                >
+                                    <div>{{ reason }}</div>
+                                    <b-icon
+                                        :style="{
+                                            opacity:
+                                                reason === selectedReason
+                                                    ? 1
+                                                    : 0.4
+                                        }"
+                                        :type="{
+                                            'is-primary':
+                                                reason === selectedReason
+                                        }"
+                                        icon="check-circle"
+                                    ></b-icon>
+                                </li>
+                            </ul>
                         </div>
 
-                        <ul class="reason-list-container">
-                            <li
-                                :key="i"
-                                @click="setReason(reason)"
-                                v-for="(reason, i) in reasonList"
+                        <div v-else>
+                            <div class="subtitle is-6">
+                                NOTE: You can claim upto 10,000 passes
+                                <br />only, in a single request
+                            </div>
+
+                            <div></div>
+
+                            <div class="title is-6">Download Template</div>
+
+                            <b-button
+                                class="has-text-primary has-text-weight-semibold"
+                                icon-left="download"
+                                size="is-small"
+                                tag="a"
+                                type="is-white"
+                                >Download Pass Template</b-button
                             >
-                                <div>{{ reason }}</div>
+
+                            <hr />
+
+                            <div class="title is-6">Upload the file</div>
+                            <div></div>
+                            <div class="subtitle is-7">
+                                Ensure all details have been filled in the
+                                template file
+                            </div>
+
+                            <label
+                                class="upload-file-container is-flex has-text-primary"
+                                for="orderFile"
+                            >
                                 <b-icon
-                                    :style="{
-                                        opacity:
-                                            reason === selectedReason ? 1 : 0.4
-                                    }"
-                                    :type="{
-                                        'is-primary': reason === selectedReason
-                                    }"
-                                    icon="check-circle"
+                                    icon="file-upload"
+                                    size="is-medium"
                                 ></b-icon>
-                            </li>
-                        </ul>
-                    </b-step-item>
-                    <b-step-item icon="numeric-2">
-                        <div class="title is-6">Select a pass type</div>
+                                <div class="text">Upload .csv file</div>
+                                <input
+                                    @change="handleFile"
+                                    accept=".csv"
+                                    hidden
+                                    id="orderFile"
+                                    name="order"
+                                    ref="orderFile"
+                                    type="file"
+                                />
+                            </label>
 
-                        <div class="pass-container">
-                            <div
-                                :class="{ active: passType === 'person' }"
-                                @click="setPassType('person')"
-                                class="pass-card"
-                            >
-                                <div class="is-flex pass-card-body">
-                                    <div>
-                                        <div class="title is-5">
-                                            Individual pass
-                                        </div>
-                                        <div class="subtitle is-7">
-                                            Each pass verifies a specific
-                                            inividual only!
-                                        </div>
-                                    </div>
-
-                                    <img
-                                        alt
-                                        src="../assets/individual-icon.png"
-                                        width="56"
-                                    />
-                                </div>
+                            <div class="file-status is-flex" v-if="file">
+                                <b-icon
+                                    icon="check-circle"
+                                    type="is-success"
+                                ></b-icon>
+                                <span class="subtitle is-6">{{
+                                    file.name
+                                }}</span>
                             </div>
+                            <br />
                             <div
-                                :class="{ active: passType === 'vehicle' }"
-                                @click="setPassType('vehicle')"
-                                class="pass-card"
+                                class="is-size-7 has-text-danger has-text-weight-semibold"
+                                v-if="apiError"
                             >
-                                <div class="is-flex pass-card-body">
-                                    <div>
-                                        <div class="title is-5">
-                                            Vehicle pass
-                                        </div>
-                                        <div
-                                            class="subtitle is-7 line-height-1.5"
-                                        >
-                                            Each pass verifies anyone operating
-                                            the vehicle!
-                                        </div>
-                                    </div>
-
-                                    <img
-                                        alt
-                                        src="../assets/vehicle-icon.png"
-                                        width="56"
-                                    />
-                                </div>
+                                {{ apiError }}
                             </div>
                         </div>
-                    </b-step-item>
-                    <b-step-item icon="numeric-3">
-                        <div class="title is-6">Download Template</div>
-
-                        <b-button
-                            class="has-text-primary has-text-weight-semibold"
-                            icon-left="download"
-                            size="is-small"
-                            tag="a"
-                            type="is-white"
-                            >Download Pass Template</b-button
-                        >
-
-                        <hr />
-
-                        <div class="title is-6">Upload the file</div>
-                        <div></div>
-                        <div class="subtitle is-7">
-                            Ensure all details have been filled in the template
-                            file
-                        </div>
-
-                        <label
-                            class="upload-file-container is-flex has-text-primary"
-                            for="orderFile"
-                        >
-                            <b-icon
-                                icon="file-upload"
-                                size="is-medium"
-                            ></b-icon>
-                            <div class="text">Upload .csv file</div>
-                            <input
-                                @change="handleFile"
-                                accept=".csv"
-                                hidden
-                                id="orderFile"
-                                name="order"
-                                ref="orderFile"
-                                type="file"
-                            />
-                        </label>
-
-                        <div class="file-status is-flex" v-if="file">
-                            <b-icon
-                                icon="check-circle"
-                                type="is-success"
-                            ></b-icon>
-                            <span class="subtitle is-6">{{ file.name }}</span>
-                        </div>
-                    </b-step-item>
-                </b-steps>
-            </template>
-
-            <template v-else>
-                <div class="is-flex request-done-container">
-                    <div>
-                        <img
-                            alt
-                            src="../assets/approvalwaiting-icon.png"
-                            width="80"
-                        />
-                    </div>
-
-                    <div class="title is-4">Request sent successfully!</div>
-                    <div class="subtitle is-7">
-                        Kindly wait until we can we can review and get back with
-                        the status of your application
-                    </div>
+                    </transition>
                 </div>
-            </template>
+
+                <template v-else>
+                    <div class="is-flex request-done-container">
+                        <div>
+                            <img
+                                alt
+                                src="../assets/approvalwaiting-icon.png"
+                                width="80"
+                            />
+                        </div>
+
+                        <div class="title is-4">Request sent successfully!</div>
+                        <div class="subtitle is-7">
+                            Kindly wait until we can we can review and get back
+                            with the status of your application
+                        </div>
+                    </div>
+                </template>
+            </transition>
 
             <transition name="slideInBottom">
                 <div class="step-navigtion-container" v-if="selectedReason">
@@ -171,8 +138,7 @@
                         type="is-primary"
                     >
                         <span v-if="requestCreated">Done</span>
-                        <span v-else-if="activeStep === 2">Send Request</span>
-                        <span v-else>Proceed</span>
+                        <span v-else>Send Request</span>
                     </b-button>
                 </div>
             </transition>
@@ -184,6 +150,7 @@
 import SideSheet from './SideSheet.vue';
 import EPassService from '../service/EPassService';
 import { getAuthToken } from '../utils/session';
+import { getError } from '../utils/error-handler';
 
 export default {
     name: 'CreateRequest',
@@ -193,7 +160,6 @@ export default {
     },
     data() {
         return {
-            activeStep: 0,
             selectedReason: null,
             passType: 'person',
             reasonList: [
@@ -218,11 +184,7 @@ export default {
                 return true;
             }
 
-            if (this.activeStep === 2 && !this.file) {
-                return true;
-            }
-
-            if (this.activeStep === 0 && !this.selectedReason) {
+            if (!this.selectedReason) {
                 return true;
             }
 
@@ -238,17 +200,9 @@ export default {
             this.passType = type;
         },
 
-        handleStep1() {
-            this.activeStep = 1;
-        },
-        handleStep2() {
-            this.activeStep = 2;
-        },
-        handleStep3() {
-            this.createOrder();
-        },
-
         handleFile() {
+            this.apiError = null;
+
             this.file = this.$refs.orderFile.files[0];
             this.$refs.orderFile.files = null;
         },
@@ -259,22 +213,11 @@ export default {
                 return;
             }
 
-            switch (this.activeStep) {
-                case 0:
-                    this.handleStep1();
-                    break;
-
-                case 1:
-                    this.handleStep2();
-                    break;
-
-                case 2:
-                    this.handleStep3();
-                    break;
-            }
+            this.createOrder();
         },
 
         async createOrder() {
+            this.apiError = null;
             const formData = new FormData();
 
             formData.append('file', this.file);
@@ -288,7 +231,7 @@ export default {
                 await EPassService.createOrder(formData);
                 this.requestCreated = true;
             } catch (error) {
-                this.apiError = error;
+                this.apiError = getError(error);
             }
 
             this.loading = false;
@@ -336,33 +279,6 @@ export default {
     }
 }
 
-.pass-card {
-    border-radius: 4px;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-    background-color: #f5f5f5;
-    padding: 16px 24px;
-    margin-top: 16px;
-    cursor: pointer;
-
-    &.active {
-        border: 2px solid #00a4ff;
-    }
-
-    &:hover:not(.active) {
-        transition: all 0.3s ease;
-
-        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
-    }
-
-    &-body {
-        justify-content: space-between;
-        align-items: center;
-        img {
-            margin-left: 8px;
-        }
-    }
-}
 .line-height-1.\5 {
     line-height: 1.5;
 }

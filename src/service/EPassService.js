@@ -106,5 +106,11 @@ export default {
             accountID,
             authToken: getAuthToken()
         });
+    },
+
+    getOrganization() {
+        return axios.post('/getOrganization', {
+            authToken: getAuthToken()
+        });
     }
 };
