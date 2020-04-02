@@ -42,7 +42,7 @@
 
                         <div v-else>
                             <div class="subtitle is-6">
-                                NOTE: You can claim upto 10,000 passes
+                                NOTE: You can claim upto 5,000 passes
                                 <br />only, in a single request
                             </div>
 
