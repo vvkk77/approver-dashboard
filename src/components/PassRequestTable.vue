@@ -6,9 +6,9 @@
                     <div class="is-flex">
                         <div class="is-flex">
                             <span class="m-r-8">Total pass requests:</span>
-                            <span class="has-text-weight-bold">{{
-                                orderList.length
-                            }}</span>
+                            <span class="has-text-weight-bold">
+                                {{ orderList.length }}
+                            </span>
                         </div>
                     </div>
                     <div class="is-flex">
@@ -113,10 +113,9 @@
                                         ? 'primary'
                                         : 'warning'
                                 "
-                                >{{
-                                    props.row.orderType | formatRequestLabel
-                                }}</lozenge
                             >
+                                {{ props.row.orderType | formatRequestLabel }}
+                            </lozenge>
                         </b-table-column>
 
                         <b-table-column
@@ -135,10 +134,9 @@
                                     )}`
                                 "
                                 class="has-text-weight-bold is-uppercase"
-                                >{{
-                                    props.row.orderStatus | formatStatusLabel
-                                }}</span
                             >
+                                {{ props.row.orderStatus | formatStatusLabel }}
+                            </span>
                         </b-table-column>
                         <b-table-column label=" " width="30">
                             <b-dropdown
@@ -372,6 +370,8 @@ export default {
         },
 
         formatStatusLabel(status) {
+            status = status.replace('_', ' ');
+
             if (status.toLowerCase() === 'created') return 'PENDING';
             if (status.toLowerCase() === 'declined') return 'REJECTED';
 
