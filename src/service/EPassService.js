@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
-import { getAuthToken } from '../utils/session';
+import { getAuthToken, get } from '../utils/session';
 import dotprop from 'dot-prop';
 
 const BASE_URL = process.env.API_BASE_URL;
@@ -99,11 +99,8 @@ export default {
     },
 
     getOrders() {
-        const userInfo = localStorage.getItem('userInfo');
-        const { accountID } = JSON.parse(userInfo);
-
         return axios.post('/getOrders', {
-            accountID,
+            accountID: get('accountID'),
             authToken: getAuthToken()
         });
     },

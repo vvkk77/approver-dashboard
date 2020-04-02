@@ -38,8 +38,8 @@
                         </button>
 
                         <b-dropdown-item disabled>
-                            <b>Logged in as {{ userInfo.accountName }}</b>
-                            <p>{{ userInfo.email }}</p>
+                            <b>Logged in as {{ user.name }}</b>
+                            <p>{{ user.email }}</p>
                         </b-dropdown-item>
                         <hr class="dropdown-divider" />
 
@@ -65,16 +65,20 @@ import { clearSession } from '../utils/session';
 export default {
     name: 'AppHeader',
     data() {
+        let user = localStorage.getItem('user');
+        if (user) user = JSON.parse(user);
+
         return {
             selectedLang: 'En',
             langs: ['Hi'],
-            userInfo: JSON.parse(localStorage.getItem('userInfo'))
+            user: user || {}
         };
     },
     methods: {
         logout() {
             localStorage.clear();
             clearSession();
+
             window.location.reload();
         }
     }

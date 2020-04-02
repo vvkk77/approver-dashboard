@@ -86,7 +86,7 @@
 <script>
 import { isValidEmail } from '../utils/helpers';
 import EPassService from '../service/EPassService';
-import { saveAuthToken } from '../utils/session';
+import { saveAuthToken, save } from '../utils/session';
 import { getError } from '../utils/error-handler';
 
 export default {
@@ -159,12 +159,18 @@ export default {
 
                 this.loading = false;
 
-                const { authToken, ...userInfo } = data;
-
-                userInfo.email = this.user.email;
+                const { authToken, accountID, accountName } = data;
 
                 saveAuthToken(authToken);
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                save('accountID', accountID);
+
+                localStorage.setItem(
+                    'user',
+                    JSON.stringify({
+                        email: this.user.email,
+                        name: accountName
+                    })
+                );
 
                 this.$router.replace('/');
             } catch (error) {
