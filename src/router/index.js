@@ -24,6 +24,7 @@ const routes = [
 
 const router = new VueRouter({
     routes,
+    base: process.env.APPLICATION_PATH,
     mode: process.env.HISTORY_MODE ? 'history' : 'hash'
 });
 
