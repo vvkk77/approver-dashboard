@@ -1,10 +1,10 @@
 import cookie from 'js-cookie';
 import { AUTHTOKEN } from './contants';
-import { IS_PROD } from './helpers';
+import { isProd } from './helpers';
 
 const cookieOptions = {
     expires: 1,
-    secure: IS_PROD,
+    secure: isProd,
     path: process.env.APPLICATION_PATH
 };
 

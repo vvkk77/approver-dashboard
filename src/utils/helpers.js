@@ -3,4 +3,5 @@ export const isValidEmail = email => {
     return EMAIL_REGEX.test(email);
 };
 
-export const IS_PROD = process.env.NODE_ENV === 'production';
+export const isProd = process.env.NODE_ENV === 'production';
+export const isGithub = window.location.hostname.indexOf('github') > -1;

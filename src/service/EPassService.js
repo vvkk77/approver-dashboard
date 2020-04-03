@@ -2,8 +2,19 @@ import axios from 'axios';
 import { SHOW_LOADING, HIDE_LOADING } from '../utils/contants';
 import { getAuthToken } from '../utils/session';
 import dotprop from 'dot-prop';
+import { isProd, isGithub } from '../utils/helpers';
 
-const BASE_URL = process.env.API_BASE_URL;
+const BASE_URL = (() => {
+    const DEFAULT_API = 'https://viruscorona.co.in';
+    const EPASS_API = `${window.location.protocol}//${window.location.hostname}/ecurfew`;
+
+    if (!isProd || isGithub) {
+        return DEFAULT_API;
+    }
+
+    return EPASS_API;
+})();
+
 const api = axios.create({
     baseURL: BASE_URL,
     headers: {
