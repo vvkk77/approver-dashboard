@@ -48,7 +48,8 @@ module.exports = {
                 'process.env.APPLICATION_PATH': JSON.stringify(
                     APPLICATION_PATH
                 ),
-                'process.env.API_BASE_URL': JSON.stringify(API_BASE_URL)
+                'process.env.API_BASE_URL': JSON.stringify(API_BASE_URL),
+                'process.env.HISTORY_MODE': !process.env.GITHUB_TOKEN
             })
         ]
     },
