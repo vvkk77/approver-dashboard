@@ -5,9 +5,9 @@
                 <div class="is-flex jc-space-between ai-center">
                     <div class="is-flex">
                         <span class="m-r-8">Total organizations:</span>
-                        <span class="has-text-weight-bold">{{
-                            filteredOrgList.length
-                        }}</span>
+                        <span class="has-text-weight-bold">
+                            {{ filteredOrgList.length }}
+                        </span>
                     </div>
 
                     <div class="is-flex">
@@ -104,11 +104,7 @@
                             >{{ props.row.name }}</b-table-column
                         >
 
-                        <b-table-column
-                            field="orgID"
-                            label="Organization ID"
-                            sortable
-                        >
+                        <b-table-column field="orgID" label="GSTIN Id" sortable>
                             <div class="has-text-dark is-size-6">
                                 {{ props.row.orgID }}
                             </div>
@@ -128,10 +124,9 @@
                             field="activePassCount"
                             label="Active passes"
                             sortable
-                            >{{
-                                props.row.activePassCount | formatNumber
-                            }}</b-table-column
                         >
+                            {{ props.row.activePassCount | formatNumber }}
+                        </b-table-column>
 
                         <b-table-column field="status" label="Status" sortable>
                             <span

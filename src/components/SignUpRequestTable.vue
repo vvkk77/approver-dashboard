@@ -26,11 +26,7 @@
                         </div>
                     </b-table-column>
 
-                    <b-table-column
-                        field="orgID"
-                        label="Organization Id"
-                        sortable
-                    >
+                    <b-table-column field="orgID" label="GSTIN Id" sortable>
                         <div class="has-text-dark is-size-6">
                             {{ props.row.orgID }}
                         </div>
