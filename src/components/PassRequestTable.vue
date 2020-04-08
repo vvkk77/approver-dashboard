@@ -228,7 +228,7 @@
                                                 icon="download"
                                                 type="is-primary"
                                             ></b-icon>
-                                            <span>Download Passes</span>
+                                            <span>Download e-Passes</span>
                                         </div>
                                     </b-dropdown-item>
                                 </template>
@@ -432,9 +432,9 @@ export default {
 
                 ele.click();
 
-                showSuccess(`QR codes downloaded successfully`);
+                showSuccess(`e-Passes downloaded successfully`);
             } catch (error) {
-                showError(`Unable to download QR codes`);
+                showError(`Unable to download e-Passes`);
             }
         },
 
