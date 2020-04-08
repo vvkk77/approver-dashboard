@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div class="column full-height">
+            <div class="column full-height mobile-login">
                 <div class="sign-up-form-container full-height">
                     <login-form></login-form>
                 </div>
@@ -67,6 +67,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~bulma/sass/utilities/_all';
+
 .sign-up-container {
     position: fixed;
     height: 100vh;
@@ -109,6 +111,40 @@ export default {
         right: 0;
         img {
             width: 100%;
+        }
+    }
+}
+
+@include mobile {
+    .sign-up-info-container {
+        padding: 1.5rem 2rem;
+
+        .logo-container {
+            img {
+                width: 100px;
+            }
+        }
+
+        .title.is-5 {
+            display: none;
+        }
+    }
+    .mobile-login {
+        position: absolute;
+        z-index: 200;
+        height: auto !important;
+        width: 100%;
+        max-width: 480px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        .sign-up-form-container {
+            border-radius: 10px;
+            box-shadow: 0 4px 16px 0 rgba($color: #000000, $alpha: 0.25);
+        }
+        .full-height {
+            height: auto;
+            max-height: 100vh;
         }
     }
 }

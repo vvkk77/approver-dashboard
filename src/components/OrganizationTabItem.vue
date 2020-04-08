@@ -2,76 +2,89 @@
     <div>
         <transition mode="out-in" name="fade">
             <div v-if="!loading && orgList.length > 0">
-                <div class="is-flex jc-space-between ai-center">
-                    <div class="is-flex">
-                        <span class="m-r-8">Total organizations:</span>
-                        <span class="has-text-weight-bold">
-                            {{ filteredOrgList.length }}
-                        </span>
+                <nav class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <div class="is-flex">
+                                <span class="m-r-8">Total organizations:</span>
+                                <span class="has-text-weight-bold">{{
+                                    filteredOrgList.length
+                                }}</span>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="is-flex">
-                        <b-field grouped>
-                            <p class="control">
-                                <b-dropdown
-                                    aria-role="list"
-                                    class="filter-options"
-                                    position="is-bottom-left"
-                                    v-model="statusOption"
-                                >
-                                    <button
-                                        class="button"
-                                        slot="trigger"
-                                        slot-scope="{ active }"
-                                    >
-                                        <span
-                                            :class="
-                                                `has-text-${getStatusClass(
-                                                    statusOption
-                                                )}`
-                                            "
-                                            class="has-text-weight-semibold is-uppercase"
-                                            >{{ statusMap[statusOption] }}</span
+                    <div class="level-right">
+                        <div class="level-item">
+                            <div class="is-flex">
+                                <b-field grouped>
+                                    <p class="control">
+                                        <b-dropdown
+                                            aria-role="list"
+                                            class="filter-options"
+                                            position="is-bottom-left"
+                                            v-model="statusOption"
                                         >
-                                        <b-icon
-                                            :icon="
-                                                active ? 'menu-up' : 'menu-down'
-                                            "
-                                        ></b-icon>
-                                    </button>
+                                            <button
+                                                class="button"
+                                                slot="trigger"
+                                                slot-scope="{ active }"
+                                            >
+                                                <span
+                                                    :class="
+                                                        `has-text-${getStatusClass(
+                                                            statusOption
+                                                        )}`
+                                                    "
+                                                    class="has-text-weight-semibold is-uppercase"
+                                                >
+                                                    {{
+                                                        statusMap[statusOption]
+                                                    }}
+                                                </span>
+                                                <b-icon
+                                                    :icon="
+                                                        active
+                                                            ? 'menu-up'
+                                                            : 'menu-down'
+                                                    "
+                                                ></b-icon>
+                                            </button>
 
-                                    <b-dropdown-item
-                                        :key="value"
-                                        :value="value"
-                                        aria-role="listitem"
-                                        v-for="(status, value) in statusMap"
-                                    >
-                                        <span
-                                            :class="
-                                                `has-text-${getStatusClass(
-                                                    value
-                                                )}`
-                                            "
-                                            class="has-text-weight-bold is-uppercase"
-                                            >{{ status }}</span
-                                        >
-                                    </b-dropdown-item>
-                                </b-dropdown>
-                            </p>
+                                            <b-dropdown-item
+                                                :key="value"
+                                                :value="value"
+                                                aria-role="listitem"
+                                                v-for="(status,
+                                                value) in statusMap"
+                                            >
+                                                <span
+                                                    :class="
+                                                        `has-text-${getStatusClass(
+                                                            value
+                                                        )}`
+                                                    "
+                                                    class="has-text-weight-bold is-uppercase"
+                                                    >{{ status }}</span
+                                                >
+                                            </b-dropdown-item>
+                                        </b-dropdown>
+                                    </p>
 
-                            <b-field>
-                                <b-input
-                                    icon="magnify"
-                                    icon-clickable
-                                    placeholder="Search..."
-                                    type="search"
-                                    v-model="searchText"
-                                ></b-input>
-                            </b-field>
-                        </b-field>
+                                    <b-field>
+                                        <b-input
+                                            icon="magnify"
+                                            icon-clickable
+                                            placeholder="Search..."
+                                            type="search"
+                                            v-model="searchText"
+                                        ></b-input>
+                                    </b-field>
+                                </b-field>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <br />
+                </nav>
+
                 <b-table
                     :current-page.sync="currentPage"
                     :data="filteredOrgList"
@@ -124,9 +137,10 @@
                             field="activePassCount"
                             label="Active passes"
                             sortable
+                            >{{
+                                props.row.activePassCount | formatNumber
+                            }}</b-table-column
                         >
-                            {{ props.row.activePassCount | formatNumber }}
-                        </b-table-column>
 
                         <b-table-column field="status" label="Status" sortable>
                             <span
