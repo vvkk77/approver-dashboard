@@ -37,7 +37,7 @@
                 >
                     <b-select
                         :disabled="Object.keys(stateMap).length === 0"
-                        @change="validatePassword"
+                        @change="validateState"
                         @focus="error.state = ''"
                         expanded
                         placeholder="Select a state"
