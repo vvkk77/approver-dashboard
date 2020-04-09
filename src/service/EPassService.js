@@ -120,9 +120,10 @@ export default {
         });
     },
 
-    approveAccount(email) {
+    approveAccount(email, requesterAccountId) {
         return api.post('/approveAccount', {
             email,
+            requesterAccountId,
             authToken: getAuthToken()
         });
     },

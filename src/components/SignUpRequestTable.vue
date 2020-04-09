@@ -54,7 +54,7 @@
                             </button>
 
                             <b-dropdown-item
-                                @click="approveSignUp(props.row.email)"
+                                @click="approveSignUp(props.row)"
                                 aria-role="listitem"
                             >
                                 <div class="is-flex dropdown-menu-item">
@@ -148,9 +148,9 @@ export default {
             }
             this.loading = false;
         },
-        async approveSignUp(email) {
+        async approveSignUp(item) {
             try {
-                await EPassService.approveAccount(email);
+                await EPassService.approveAccount(item.email, item.id);
                 await this.fetchSignUpRequests();
                 showSuccess(`Request Approved!`);
             } catch (error) {
