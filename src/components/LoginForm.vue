@@ -36,7 +36,7 @@
                     label="State"
                 >
                     <b-select
-                        :disabled="stateList.length === 0"
+                        :disabled="Object.keys(stateMap).length === 0"
                         @change="validatePassword"
                         @focus="error.state = ''"
                         expanded
@@ -44,10 +44,10 @@
                         v-model="user.state"
                     >
                         <option
-                            :key="value"
-                            :value="item"
-                            v-for="(item, value) in stateList"
-                            >{{ item }}</option
+                            :key="index"
+                            :value="state"
+                            v-for="(state, index) in stateMap"
+                            >{{ state }}</option
                         >
                     </b-select>
                 </b-field>
@@ -105,8 +105,8 @@ export default {
     },
 
     computed: {
-        stateList() {
-            return this.$store.state.stateList;
+        stateMap() {
+            return this.$store.state.stateMap;
         }
     },
 

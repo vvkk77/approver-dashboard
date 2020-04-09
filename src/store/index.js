@@ -6,18 +6,18 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        stateList: []
+        stateMap: {}
     },
     mutations: {
         setStateList(store, list) {
-            store.stateList = list;
+            store.stateMap = list;
         }
     },
     actions: {
         async fetchStateList({ commit }) {
-            const { data: stateList } = await EPassService.fetchStateList();
-            commit('setStateList', stateList);
-            localStorage.setItem('stateList', stateList);
+            const { data: res } = await EPassService.fetchStateList();
+            commit('setStateList', res.stateMap);
+            localStorage.setItem('stateList', res.stateMap);
         }
     }
 });
