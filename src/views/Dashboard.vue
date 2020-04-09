@@ -24,7 +24,6 @@ import AppHeader from '../components/AppHeader.vue';
 import OrganizationTabItem from '../components/OrganizationTabItem.vue';
 import SignUpRequestTable from '../components/SignUpRequestTable.vue';
 import PassRequestTable from '../components/PassRequestTable.vue';
-import EPassService from '../service/EPassService';
 
 export default {
     components: {
@@ -36,22 +35,19 @@ export default {
     methods: {
         onTabChange(index) {
             switch (index) {
-                case 0:
-                    EPassService.getAllOrders();
-                    break;
+            case 0:
+                this.$store.dispatch('fetchAllOrders');
+                break;
 
-                case 1:
-                    EPassService.getSignUpRequests();
-                    break;
+            case 1:
+                this.$store.dispatch('fetchSignUpRequests');
+                break;
 
-                case 2:
-                    EPassService.getAllOrganizations();
-                    break;
+            case 2:
+                this.$store.dispatch('fetchAllOrganizations');
+                break;
             }
         }
-    },
-    mounted() {
-        EPassService.getApproverUserProfile();
     }
 };
 </script>

@@ -7,9 +7,9 @@
                         <div class="level-item">
                             <div class="is-flex">
                                 <span class="m-r-8">Total pass requests:</span>
-                                <span class="has-text-weight-bold">{{
-                                    filteredOrderList.length
-                                }}</span>
+                                <span class="has-text-weight-bold">
+                                    {{ filteredOrderList.length }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -36,10 +36,11 @@
                                                         )}`
                                                     "
                                                     class="has-text-weight-semibold is-uppercase"
-                                                    >{{
-                                                        statusMap[statusOption]
-                                                    }}</span
                                                 >
+                                                    {{
+                                                        statusMap[statusOption]
+                                                    }}
+                                                </span>
                                                 <b-icon
                                                     :icon="
                                                         active
@@ -137,10 +138,9 @@
                                         ? 'primary'
                                         : 'warning'
                                 "
-                                >{{
-                                    props.row.orderType | formatRequestLabel
-                                }}</lozenge
                             >
+                                {{ props.row.orderType | formatRequestLabel }}
+                            </lozenge>
                         </b-table-column>
 
                         <b-table-column
@@ -164,10 +164,9 @@
                                     )}`
                                 "
                                 class="has-text-weight-bold is-uppercase"
-                                >{{
-                                    props.row.orderStatus | formatStatusLabel
-                                }}</span
                             >
+                                {{ props.row.orderStatus | formatStatusLabel }}
+                            </span>
                         </b-table-column>
                         <b-table-column label=" " width="30">
                             <b-dropdown
@@ -324,16 +323,9 @@ export default {
     components: { Lozenge, EmptyTable },
 
     data() {
-        let orderList = localStorage.getItem('orderList');
-
-        if (orderList) {
-            orderList = JSON.parse(orderList);
-        }
-
         return {
             statusOption: 'all',
             searchText: '',
-            orderList: orderList || [],
             showDeclineModal: false,
 
             declineReason: '',
@@ -350,6 +342,9 @@ export default {
     },
 
     computed: {
+        orderList() {
+            return this.$store.state.orderList;
+        },
         statusMap() {
             const map = {
                 all: 'Show All'
@@ -403,13 +398,8 @@ export default {
         }
     },
     methods: {
-        async fetchAllOrders() {
-            try {
-                const { data } = await EPassService.getAllOrders();
-                this.orderList = data.orders;
-            } catch (error) {
-                showError(`Unable to fetch requests`);
-            }
+        fetchAllOrders() {
+            this.$store.dispatch('fetchAllOrders');
         },
 
         async approveRequest(orderId) {

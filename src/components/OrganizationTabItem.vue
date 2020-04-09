@@ -266,15 +266,9 @@ export default {
     name: 'OrganizationTabItem',
     components: { EmptyTable },
     data() {
-        let orgList = localStorage.getItem('orgList');
-        if (orgList) {
-            orgList = JSON.parse(orgList);
-        }
-
         return {
             statusOption: 'all',
             searchText: '',
-            orgList: orgList || [],
             loading: false,
             orgEditLimit: null,
             newLimit: null,
@@ -304,6 +298,10 @@ export default {
     },
 
     computed: {
+        orgList() {
+            return this.$store.state.orgList;
+        },
+
         statusMap() {
             const map = {
                 all: 'Show All'
@@ -343,15 +341,8 @@ export default {
     },
 
     methods: {
-        async fetchAllOrganizations() {
-            this.loading = true;
-            try {
-                const { data } = await EPassService.getAllOrganizations();
-                this.orgList = data.organizations;
-            } catch (error) {
-                showError(`Unable to fetch organizations`);
-            }
-            this.loading = false;
+        fetchAllOrganizations() {
+            this.$store.dispatch('fetchAllOrganizations');
         },
 
         async submitLimit() {
