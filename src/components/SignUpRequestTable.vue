@@ -9,9 +9,9 @@
                                 <span class="m-r-8"
                                     >Total signup requests:</span
                                 >
-                                <span class="has-text-weight-bold">{{
-                                    signUpList.length
-                                }}</span>
+                                <span class="has-text-weight-bold">
+                                    {{ signUpList.length }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -90,7 +90,10 @@
                                     </div>
                                 </b-dropdown-item>
 
-                                <b-dropdown-item aria-role="listitem" disabled>
+                                <b-dropdown-item
+                                    @click="declineSignUp(props.row)"
+                                    aria-role="listitem"
+                                >
                                     <div class="is-flex dropdown-menu-item">
                                         <b-icon
                                             icon="close-circle-outline"
@@ -163,11 +166,29 @@ export default {
 
         async approveSignUp(item) {
             try {
-                await EPassService.approveAccount(item.email, item.id);
+                await EPassService.approveAccount(
+                    item.email,
+                    item.id,
+                    'ACCEPT'
+                );
                 await this.fetchSignUpRequests();
                 showSuccess(`Request Approved!`);
             } catch (error) {
                 showError(`Unable to approve request`);
+            }
+        },
+
+        async declineSignUp(item) {
+            try {
+                await EPassService.approveAccount(
+                    item.email,
+                    item.id,
+                    'DECLINE'
+                );
+                await this.fetchSignUpRequests();
+                showSuccess(`Request Declined!`);
+            } catch (error) {
+                showError(`Unable to decline request`);
             }
         }
     },

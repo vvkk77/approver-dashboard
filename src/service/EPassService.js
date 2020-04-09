@@ -120,10 +120,11 @@ export default {
         });
     },
 
-    approveAccount(email, requesterAccountId) {
+    approveAccount(email, requesterAccountId, accountAction) {
         return api.post('/approveAccount', {
             email,
             requesterAccountId,
+            accountAction,
             authToken: getAuthToken()
         });
     },
@@ -181,10 +182,10 @@ export default {
             });
     },
 
-    setPassLimit(newLimit, organizationID) {
+    setPassLimit(newLimit, id) {
         return api.post('/setPassLimit', {
             newLimit,
-            organizationID,
+            id,
             authToken: getAuthToken()
         });
     },
