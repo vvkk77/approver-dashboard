@@ -168,7 +168,7 @@
                                 </button>
 
                                 <b-dropdown-item
-                                    @click="orgEditLimit = props.row.orgID"
+                                    @click="orgEditLimit = props.row.id"
                                     aria-role="listitem"
                                 >
                                     <div class="is-flex dropdown-menu-item">
@@ -287,7 +287,7 @@ export default {
     watch: {
         orgEditLimit(value) {
             if (value) {
-                const org = this.orgList.find(o => o.orgID === value);
+                const org = this.orgList.find(o => o.id === value);
 
                 org && (this.newLimit = org.activePassLimit);
             }
