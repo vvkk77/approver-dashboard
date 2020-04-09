@@ -152,7 +152,7 @@
                         >
 
                         <b-table-column
-                            field="status"
+                            field="orderStatus"
                             label="Status"
                             sortable
                             width="120"
