@@ -30,6 +30,27 @@
                         v-model="user.pass"
                     ></b-input>
                 </b-field>
+                <b-field
+                    :message="error.state"
+                    :type="{ 'is-danger': !!error.state }"
+                    label="State"
+                >
+                    <b-select
+                        :disabled="stateList.length === 0"
+                        @change="validatePassword"
+                        @focus="error.state = ''"
+                        expanded
+                        placeholder="Select a state"
+                        v-model="user.state"
+                    >
+                        <option
+                            :key="value"
+                            :value="item"
+                            v-for="(item, value) in stateList"
+                            >{{ item }}</option
+                        >
+                    </b-select>
+                </b-field>
 
                 <div
                     class="is-size-7 has-text-danger has-text-weight-semibold"
@@ -69,17 +90,26 @@ export default {
             registered: true,
             user: {
                 email: '',
-                pass: ''
+                pass: '',
+                state: null
             },
             error: {
                 email: '',
-                pass: ''
+                pass: '',
+                state: ''
             },
             loading: false,
 
             apiError: null
         };
     },
+
+    computed: {
+        stateList() {
+            return this.$store.state.stateList;
+        }
+    },
+
     methods: {
         validateEmail() {
             this.error.email = '';
@@ -96,11 +126,19 @@ export default {
             }
         },
 
+        validateState() {
+            this.error.state = '';
+            if (!this.user.state) {
+                this.error.state = 'Please select a state';
+            }
+        },
+
         isValid() {
             this.validateEmail();
             this.validatePassword();
+            this.validateState();
 
-            return !this.error.email && !this.error.pass;
+            return !this.error.email && !this.error.pass && !this.error.state;
         },
 
         async login() {
@@ -113,7 +151,8 @@ export default {
             try {
                 const { data } = await EPassService.signIn(
                     this.user.email.trim(),
-                    this.user.pass.trim()
+                    this.user.pass.trim(),
+                    this.user.state
                 );
 
                 this.loading = false;
@@ -127,7 +166,14 @@ export default {
                 this.loading = false;
                 this.apiError = getError(error);
             }
+        },
+        fetchStateList() {
+            this.$store.dispatch('fetchStateList');
         }
+    },
+
+    created() {
+        this.fetchStateList();
     }
 };
 </script>

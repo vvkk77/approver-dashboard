@@ -60,8 +60,13 @@ api.interceptors.response.use(
 );
 
 export default {
-    signIn(email, password) {
-        return api.post('/signin', { email, password, accountType: 'admin' });
+    signIn(email, password, stateName) {
+        return api.post('/signin', {
+            email,
+            password,
+            accountType: 'admin',
+            stateName
+        });
     },
 
     createAccount({ name, email, password, orgID, orgName }) {
@@ -189,5 +194,9 @@ export default {
                 authToken: getAuthToken()
             }
         });
+    },
+
+    fetchStateList() {
+        return api.post(`/fetchStateList`);
     }
 };

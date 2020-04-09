@@ -9,7 +9,12 @@
                 <img alt="iPass Logo" src="../assets/logo.png" width="112" />
             </router-link>
             <div class="seperator"></div>
-            <span class="title is-4">Approver Dashboard</span>
+            <span class="title is-4">
+                Approver Dashboard
+                <b class="title is-4 has-text-grey" v-if="user.stateName"
+                    >[{{ user.stateName }}]</b
+                >
+            </span>
         </div>
         <div class="is-flex header-end">
             <b-dropdown aria-role="list" position="is-bottom-left">
@@ -64,7 +69,8 @@ export default {
             langs: ['Hi'],
             user: {
                 name: '',
-                email: ''
+                email: '',
+                stateName: ''
             }
         };
     },
